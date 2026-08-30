@@ -66,7 +66,30 @@ jobs:
           mkdir -p "$stage/bin" "$stage/frontend" "$stage/models"
           cp -a dist/pyinstaller/linux/UrbanFly.Backend "$stage/bin/"
           cp -a frontend/dist "$stage/frontend/dist"
-          unzip -q "dist/assets/UrbanFly-HelsinkiCentral1km-Assets-${RELEASE_TAG}.zip" -d "$stage"
+          # Windows PowerShell Compress-Archive stores entry names with backslashes.
+          # Python's zipfile lets us normalize those entries safely on Linux.
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          archive = Path("dist/assets") / f"UrbanFly-HelsinkiCentral1km-Assets-{os.environ['RELEASE_TAG']}.zip"
+          destination = Path("dist/stage/linux/UrbanFly")
+          with ZipFile(archive) as bundle:
+              for member in bundle.infolist():
+                  parts = [part for part in member.filename.replace("\\", "/").split("/") if part not in ("", ".")]
+                  if not parts:
+                      continue
+                  if any(part == ".." for part in parts):
+                      raise RuntimeError(f"拒绝不安全的 ZIP 路径: {member.filename}")
+                  target = destination.joinpath(*parts)
+                  if member.is_dir():
+                      target.mkdir(parents=True, exist_ok=True)
+                  else:
+                      target.parent.mkdir(parents=True, exist_ok=True)
+                      with bundle.open(member) as source, target.open("wb") as output:
+                          output.write(source.read())
+          PY
           cp models/helsinki_observation_policy_v1.pt "$stage/models/"
           cp models/helsinki_observation_policy_v1.metrics.json "$stage/models/"
           cp models/helsinki_latent_world_model_v1.pt "$stage/models/"
