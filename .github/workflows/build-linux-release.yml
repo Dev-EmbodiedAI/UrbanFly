@@ -83,7 +83,7 @@ jobs:
                   if any(part == ".." for part in parts):
                       raise RuntimeError(f"拒绝不安全的 ZIP 路径: {member.filename}")
                   target = destination.joinpath(*parts)
-                  if member.is_dir():
+                  if member.is_dir() or member.filename.endswith(("/", "\\")):
                       target.mkdir(parents=True, exist_ok=True)
                   else:
                       target.parent.mkdir(parents=True, exist_ok=True)
