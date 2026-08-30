@@ -1,0 +1,78 @@
+wam_mpc:
+  world_model: jepa
+  history: 4
+  depth_max_m: 20.0
+  depth_shape: [96, 160]
+
+env:
+  physics_hz: 50
+  sensor_hz: 10
+  policy_hz: 10
+  success_radius_m: 0.75
+  success_dwell_s: 0.2
+  max_episode_s: 30.0
+  safety_shield: true
+  max_consecutive_planner_failures: 3
+
+action:
+  type: body_velocity_flu
+  physical_limits: [6.0, 6.0, 3.0, 1.0471976]
+  min: [-1.0, -1.0, -1.0, -1.0]
+  max: [1.0, 1.0, 1.0, 1.0]
+
+jepa:
+  model: jepa
+  state_dim: 13
+  trajectory_dim: 9
+  latent_dim: 96
+  layers: 2
+  heads: 4
+  max_horizon: 64
+  ema_decay: 0.996
+  mask_ratio: 0.5
+  mask_patch_size: 12
+  dropout: 0.15
+
+adapter:
+  hidden_dim: 256
+  dynamics_layers: 2
+  action_scale: [6.0, 6.0, 3.0, 1.0471976]
+  physics_residual_scale: 0.25
+  clearance_margin_m: 0.75
+  clearance_temperature_m: 0.35
+
+mppi:
+  horizon: 15
+  dt: 0.1
+  num_samples: 256
+  num_iterations: 4
+  temperature: 1.0
+  noise_sigma: [0.55, 0.55, 0.35, 0.35]
+  warm_start: true
+  save_mpc_debug: false
+
+cost:
+  goal: 1.0
+  intermediate_goal: 0.15
+  collision: 20.0
+  smoothness: 0.1
+  control: 0.01
+  hard_collision: 1000.0
+  hard_collision_probability: 0.8
+
+evaluation:
+  episodes: 5
+  max_steps: 300
+  randomize_lateral_start_m: 0.5
+  save_visualization: true
+
+training:
+  batch_size: 64
+  epochs: 60
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  workers: 0
+  loss_weights:
+    latent: 1.0
+    state: 2.0
+    collision: 5.0

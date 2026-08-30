@@ -1,0 +1,14 @@
+model: transformer
+history: 4
+depth_max_m: 20.0
+state_dim: 13
+trajectory_dim: 9
+latent_dim: 64
+layers: 2
+heads: 4
+dropout: 0.15
+max_horizon: 64
+mc_dropout_samples: 8
+batch_size: 8
+epochs: 20
+learning_rate: 0.0003

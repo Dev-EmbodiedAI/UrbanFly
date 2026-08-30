@@ -1,0 +1,42 @@
+{
+  "benchmark": "urbanfly_semantic_fleet_component_qa_v1",
+  "status": "PASS",
+  "scope": "semantic event gate + dynamic constraint adapter + fleet assignment",
+  "explicitly_not_tested": [
+    "Qwen model inference",
+    "RGB-D visual event recognition",
+    "static-map path-planner validation of detour waypoints",
+    "multi-UAV 6-DOF closed-loop flight",
+    "frontend visualization"
+  ],
+  "seed": 20260829,
+  "cases": 5000,
+  "fleet_size_range": [
+    3,
+    5
+  ],
+  "total_tasks": 30038,
+  "assigned_tasks": 24083,
+  "blocked_tasks": 5955,
+  "assignment_rate": 0.8017511152540115,
+  "replan_tasks": 10029,
+  "event_changed_assignment_cases": 919,
+  "invariant_failure_count": 0,
+  "invariant_failure_examples": [],
+  "determinism_failures": 0,
+  "gate_valid_accepts": 4334,
+  "gate_invalid_rejects": 4334,
+  "gate_trials": 4334,
+  "latency_ms": {
+    "mean": 2.009643839999808,
+    "p50": 1.496600000109538,
+    "p95": 5.514769999899728,
+    "max": 11.887399999977788
+  },
+  "acceptance": {
+    "invariant_failure_count": 0,
+    "determinism_failures": 0,
+    "gate_invalid_rejection_rate": 1.0,
+    "latency_p95_ms_max": 20.0
+  }
+}

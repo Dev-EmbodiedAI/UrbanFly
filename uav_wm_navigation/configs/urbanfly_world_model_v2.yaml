@@ -1,0 +1,68 @@
+schema: urbanfly-world-model-v2
+seed: 20260731
+
+timing:
+  physics_hz: 50
+  rgbd_hz: 10
+  policy_hz: 5
+  success_radius_m: 3.0
+  success_dwell_s: 2.0
+
+sensors:
+  rgb:
+    width: 640
+    height: 360
+    codec: jpeg
+    quality: 95
+  depth:
+    clip_m: 120.0
+    codec: png_u16_lossless
+  gold_test:
+    rgb: png_lossless
+    depth: float32
+
+action:
+  frame: body_flu
+  normalized_range: [-1.0, 1.0]
+  forward_mps: 6.0
+  lateral_mps: 6.0
+  vertical_mps: 3.0
+  yaw_rate_degrees_s: 60.0
+
+split:
+  tile_size_m: 250
+  buffer_m: 25
+  train_tiles: 10
+  validation_tiles: 2
+  unseen_test_tiles: 4
+  prohibit_cross_split_trajectories: true
+
+collection:
+  quick:
+    trajectories: 200
+    target_frames: 100000
+  formal:
+    trajectories: 3000
+    target_frames: 1500000
+    counterfactual_branches: 200000
+  behavior_percent:
+    geometric_mpc_expert: 40
+    perturbed_expert: 25
+    active_near_miss: 20
+    failure_recovery: 10
+    random_exploration: 5
+
+safety:
+  transparent: true
+  benchmark_raw_policy: true
+  benchmark_shielded_policy: true
+  log_raw_and_executed_actions: true
+  intervention_budget_percent: 5.0
+
+acceptance:
+  synchronization_error_ms_max: 110
+  corrupt_frame_rate_percent_max: 0.1
+  p95_control_latency_ms_max: 180
+  quick_routes: 120
+  id_success_rate_min: 0.80
+  unseen_success_rate_min: 0.60

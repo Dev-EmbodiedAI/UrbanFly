@@ -1,0 +1,46 @@
+schema: urbanfly-world-model-evaluation-v2
+training_seeds: [101, 202, 303, 404, 505]
+ablation_seeds: [101, 202, 303]
+route_seed: 20260731
+
+methods:
+  - geometric_mpc_privileged
+  - reactive_ppo_or_drq
+  - legacy_urbanfly_rssm
+  - arr_fly
+  - dreamerv3_continuous
+  - dreamerv3_continuous_cpa
+  - tdmpc2_continuous
+  - tdmpc2_continuous_cpa
+  - vjepa2_action_conditioned
+  - vjepa2_action_conditioned_cpa
+
+groups:
+  - {id: train_id, routes: 100}
+  - {id: unseen_tiles, routes: 100}
+  - {id: appearance_shift, routes: 100}
+  - {id: dynamics_shift, routes: 100}
+  - {id: stress_dynamic_clutter, routes: 100}
+
+statistics:
+  success_interval: wilson_95
+  continuous_interval: paired_route_bootstrap_95
+  bootstrap_samples: 10000
+  checkpoint_selection: validation_only
+  publish_all_registered_seeds: true
+
+latency:
+  measure_sensor_to_action: true
+  percentiles: [50, 95]
+  p95_limit_ms: 180
+
+ablation_axes:
+  modalities: [rgb, depth, rgb_depth, rgb_depth_proprioception]
+  temporal_frames: [1, 4, 15]
+  planning_horizon_steps: [1, 8, 15, 25]
+  data_percent: [10, 25, 50, 100]
+  data_mixture: [expert, expert_perturbed, expert_perturbed_active_risk]
+  vjepa_tuning: [random_initialization, frozen, last_four_layers_lora]
+  cpa: [none, reward_only, auxiliary_head_only, reward_and_auxiliary]
+  safety_layer: [off, transparent_on]
+  precision: [fp32, fp16]

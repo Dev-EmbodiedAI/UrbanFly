@@ -1,0 +1,25 @@
+methods: [yopo, yopo_dreamerv3, yopo_jepa, yopo_occflow]
+training_seeds: [101, 202, 303]
+seeds: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+maps: [Town10HD, Town05]
+scenarios: [StreetCanyon, IntersectionTurn, OccludedCrossing, DynamicCrossing, NarrowPassage, DenseMixedUrban]
+difficulties: [easy, medium, hard]
+max_steps: 120
+goal_tolerance_m: 1.0
+inference_timeout_ms: 80.0
+mc_dropout_samples: 5
+max_risk: 0.75
+rerank_weights: {yopo: 1.0, collision: 4.0, progress: 1.0, clearance: 1.0, failure: 2.0, uncertainty: 1.0}
+safety:
+  max_speed_mps: 5.0
+  max_acceleration_mps2: 4.0
+  max_yaw_rate_rps: 1.2
+  emergency_depth_m: 0.8
+  slow_depth_m: 3.0
+  min_altitude_m: 0.5
+  target_altitude_m: 2.0
+  altitude_kp: 1.5
+  max_altitude_m: 60.0
+  bounds_min_nwu: [-500.0, -500.0, 0.0]
+  bounds_max_nwu: [500.0, 500.0, 80.0]
+  collision_debounce_steps: 2

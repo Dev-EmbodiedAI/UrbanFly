@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07131a">
+  <meta name="description" content="UrbanFly 实景城市低空无人机数字孪生仿真平台">
+  <title>UrbanFly · 城市低空数字孪生</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <main id="app">
+    <header id="top-bar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">U</div>
+        <div>
+          <h1>UrbanFly</h1>
+          <p>城市低空数字孪生</p>
+        </div>
+      </div>
+
+      <div class="scene-identity">
+        <span class="eyebrow">REAL-WORLD TWIN / 城市</span>
+        <strong>1 km 城市功能分区试验场</strong>
+      </div>
+
+      <div id="controls">
+        <select id="scenario-select" aria-label="选择任务场景">
+          <option value="">选择真实任务场景</option>
+        </select>
+        <select id="algorithm-select" aria-label="选择调度算法">
+          <option value="cbba">CBBA 协同调度</option>
+          <option value="hungarian">匈牙利算法</option>
+          <option value="greedy">贪心最近邻</option>
+        </select>
+        <div class="control-cluster" aria-label="仿真播放控制">
+          <button id="btn-play" title="播放" aria-label="播放">▶</button>
+          <button id="btn-pause" title="暂停" aria-label="暂停">Ⅱ</button>
+          <button id="btn-stop" title="复位" aria-label="复位">■</button>
+        </div>
+        <label class="speed-control">
+          <span>倍率</span>
+          <select id="speed-select" aria-label="仿真速度">
+            <option value="1">1×</option>
+            <option value="2" selected>2×</option>
+            <option value="5">5×</option>
+            <option value="10">10×</option>
+          </select>
+        </label>
+        <time id="sim-time">00:00</time>
+      </div>
+    </header>
+
+    <section id="canvas-container" aria-label="三维城市数字孪生视图">
+      <canvas id="render-canvas"></canvas>
+
+      <div id="twin-loading" role="status" aria-live="polite">
+        <div class="loading-card">
+          <div class="splat-loader" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <span class="eyebrow">CITYGS STREAM</span>
+          <h2 data-loading-title>正在准备实景数字孪生</h2>
+          <p data-loading-detail>城市 · 摄影测量网格初始化</p>
+          <div class="loading-track"><span></span></div>
+          <small>高保真实景资产首次加载需要一些时间</small>
+        </div>
+      </div>
+
+      <aside id="left-panel" class="side-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">TWIN LAYER</span>
+            <h2>实景环境</h2>
+          </div>
+          <span id="twin-status" class="status-pill">正在载入实景</span>
+        </div>
+
+        <dl class="scene-facts">
+          <div><dt>重建源</dt><dd id="scene-source">城市摄影测量网格</dd></div>
+          <div><dt>运行边界</dt><dd id="scene-extent">1000 × 1000 m</dd></div>
+          <div><dt>坐标系统</dt><dd>EPSG:3879 · 米制</dd></div>
+          <div><dt>碰撞代理</dt><dd>BVH 网格 / 0.5 m ESDF</dd></div>
+        </dl>
+
+        <div class="panel-divider"></div>
+
+        <div class="section-title">
+          <span>场景分析</span>
+          <strong>SEMANTIC / DEBUG</strong>
+        </div>
+        <label class="display-quality-control">
+          <span>显示品质</span>
+          <select id="display-quality" aria-label="显示品质">
+            <option value="smooth" selected>流畅优先</option>
+            <option value="detail">精细展示</option>
+          </select>
+        </label>
+        <label class="display-quality-control">
+          <span>近精远简（仅展示）</span>
+          <input id="display-lod" type="checkbox" checked aria-label="近精远简（仅展示）">
+        </label>
+        <button id="display-benchmark" type="button">渲染测速 · 10 秒</button>
+        <output id="display-benchmark-result" aria-live="polite"></output>
+        <div class="diagnostic-controls">
+          <button id="toggle-zoning-layer" type="button" aria-pressed="false">
+            功能分区
+          </button>
+          <button id="toggle-collision-layer" type="button" aria-pressed="false">
+            碰撞网格
+          </button>
+          <button id="toggle-esdf-layer" type="button" aria-pressed="false">
+            ESDF 切片
+          </button>
+          <select id="esdf-altitude-select" aria-label="ESDF 切片高度">
+            <option value="10">10 m</option>
+            <option value="20">20 m</option>
+            <option value="30" selected>30 m</option>
+            <option value="40">40 m</option>
+          </select>
+        </div>
+        <p id="collision-layer-stats" class="diagnostic-stats">
+          正在载入可计算几何…
+        </p>
+        <div id="zoning-legend" class="zoning-legend"></div>
+
+        <div class="panel-divider"></div>
+
+        <div class="section-title">
+          <span>飞行器</span>
+          <strong id="drone-count">0 架在线</strong>
+        </div>
+        <div id="drone-list"></div>
+      </aside>
+
+      <aside id="right-panel" class="side-panel">
+        <div class="tab-bar" role="tablist" aria-label="任务信息">
+          <button class="tab-btn active" data-tab="tasks" role="tab">任务</button>
+          <button class="tab-btn" data-tab="stats" role="tab">指标</button>
+          <button class="tab-btn" data-tab="comm" role="tab">通信</button>
+          <button class="tab-btn" data-tab="sensors" role="tab">传感器</button>
+          <button class="tab-btn" data-tab="world-model" role="tab">世界模型</button>
+          <button class="tab-btn" data-tab="semantic-agent" role="tab">语义智能体</button>
+        </div>
+        <div id="tab-tasks" class="tab-content active">
+          <div id="task-summary"></div>
+          <div id="task-list"></div>
+        </div>
+        <div id="tab-stats" class="tab-content">
+          <div id="stats-panel"></div>
+        </div>
+        <div id="tab-comm" class="tab-content">
+          <canvas id="comm-canvas" width="280" height="240"></canvas>
+          <p id="comm-stats">等待实时通信拓扑</p>
+        </div>
+        <div id="tab-sensors" class="tab-content sensor-tab">
+          <div class="sensor-toolbar">
+            <select id="sensor-drone-select" aria-label="选择传感器无人机"></select>
+            <span>同步 RGB-D</span>
+          </div>
+          <figure class="sensor-feed">
+            <figcaption><span>FRONT_CENTER / SCENE</span><strong>RGB</strong></figcaption>
+            <canvas id="sensor-rgb" width="320" height="180"></canvas>
+          </figure>
+          <figure class="sensor-feed">
+            <figcaption><span>DEPTH_PERSPECTIVE / m</span><strong>DEPTH</strong></figcaption>
+            <canvas id="sensor-depth" width="320" height="180"></canvas>
+          </figure>
+          <p id="sensor-status" class="sensor-status">等待无人机传感器帧</p>
+          <dl class="sensor-spec">
+            <div><dt>内参</dt><dd>90° VFOV · 640 × 360</dd></div>
+            <div><dt>安装位姿</dt><dd>机头 1.05 m · 下俯 8°</dd></div>
+            <div><dt>输出</dt><dd>RGB8 + float32 深度米</dd></div>
+          </dl>
+        </div>
+        <div id="tab-world-model" class="tab-content world-model-tab">
+          <div class="world-model-heading">
+            <span>IMAGINED ROLLOUTS</span>
+            <strong id="world-model-status">等待世界模型</strong>
+          </div>
+          <canvas id="world-model-canvas" width="320" height="250"></canvas>
+          <div class="world-model-legend">
+            <span><i class="selected"></i>执行轨迹</span>
+            <span><i class="safe"></i>安全候选</span>
+            <span><i class="risk"></i>风险候选</span>
+          </div>
+          <dl id="world-model-metrics" class="sensor-spec"></dl>
+          <p class="world-model-note">
+            仅执行黄色轨迹的第一小段；下一次观测后重新想象并决策。
+          </p>
+        </div>
+        <div id="tab-semantic-agent" class="tab-content semantic-agent-tab">
+          <div class="semantic-agent-heading">
+            <div>
+              <span class="eyebrow">SEMANTIC MISSION LAYER</span>
+              <strong id="semantic-agent-status">未启用</strong>
+            </div>
+            <span id="semantic-agent-authority" class="status-pill">NO CONTROL</span>
+          </div>
+          <dl id="semantic-agent-facts" class="semantic-agent-facts"></dl>
+          <div class="section-title"><span>已接受事件</span><strong id="semantic-event-count">0 ACTIVE</strong></div>
+          <div id="semantic-event-list" class="semantic-event-list"></div>
+          <div class="section-title"><span>任务分配</span><strong id="semantic-plan-count">0 PLAN</strong></div>
+          <div id="semantic-assignment-list" class="semantic-assignment-list"></div>
+          <p class="semantic-agent-note">大模型仅生成结构化语义建议；确定性安全门、调度器和飞控拥有最终执行权。</p>
+        </div>
+      </aside>
+
+      <div class="view-legend" aria-label="视角快捷键">
+        <span><kbd>1</kbd> 自由视角</span>
+        <span><kbd>2</kbd> 跟随无人机</span>
+        <span><kbd>3</kbd> 空域俯视</span>
+        <span><kbd>F</kbd> 切换目标</span>
+      </div>
+
+      <footer id="event-bar">
+        <div id="connection-status">
+          <i></i>
+          <span>本地演示模式</span>
+        </div>
+        <div id="event-stream"></div>
+        <div id="runtime-health" class="runtime-health" aria-label="数字孪生运行健康">
+          <span id="health-backend" data-level="muted">CORE —</span>
+          <span id="health-sim" data-level="muted">SIM —</span>
+          <span id="health-sensor" data-level="muted">RGB-D —</span>
+          <span id="health-network" data-level="muted">WS —</span>
+          <span id="health-flow" data-level="muted">PIPE —</span>
+          <span id="health-page" data-level="muted">VIEW —</span>
+        </div>
+        <span class="coordinate-readout">LOCAL ENU · ORIGIN 0, 0, 0 m</span>
+      </footer>
+    </section>
+  </main>
+
+  <script type="module" src="/src/index.js"></script>
+</body>
+</html>

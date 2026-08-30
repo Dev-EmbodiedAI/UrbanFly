@@ -1,0 +1,8 @@
+# Minimal dependency set for the packaged Helsinki digital-twin runtime.
+# Training, local foundation-model weights, notebooks and developer tooling are
+# deliberately excluded from end-user releases.
+aiohttp>=3.9,<4
+numpy>=2.0,<3
+scipy>=1.10,<2
+trimesh>=4.0,<5
+Pillow>=10,<13

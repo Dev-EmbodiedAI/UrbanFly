@@ -1,0 +1,424 @@
+{
+  "qa": "urbanfly_qwen_semantic_fleet_helsinki_6dof_v1",
+  "status": "PASS",
+  "failures": [],
+  "scope": [
+    "4-UAV Helsinki mission-level closed loop",
+    "50 Hz six-degree-of-freedom dynamics",
+    "scripted semantic event ingestion and gate",
+    "temporary obstacle/no-fly/weather/failure effects",
+    "deterministic task reallocation",
+    "static collision-map route readback"
+  ],
+  "explicitly_not_tested": [
+    "Qwen model inference",
+    "RGB-D visual event recognition",
+    "frontend visual rendering",
+    "real PX4 hardware"
+  ],
+  "scene": "D:\\AI\\UrbanFly\\data\\helsinki_mesh\\HelsinkiCentral1km",
+  "scene_load_s": 0.3499108000000888,
+  "simulated_duration_s": 300.0000000000171,
+  "physics_steps": 15000,
+  "wall_time_s": 13.342048100000284,
+  "realtime_factor": 22.485303437034585,
+  "fleet_size": 4,
+  "task_count": 4,
+  "completed_tasks": [
+    "INSPECT-WEST",
+    "MEDICAL-NORTH",
+    "INSPECT-EAST",
+    "DELIVERY-SOUTH"
+  ],
+  "completion_rate": 1.0,
+  "semantic_events_total": 4,
+  "semantic_events_consumed": 4,
+  "semantic_events_accepted": 4,
+  "applied_plan_count": 18,
+  "path_validation_failure_count": 0,
+  "failure_recovery_count": 1,
+  "failure_recoveries": [
+    {
+      "time_s": 55.000000000003,
+      "failed_drone_id": "UAV-ALPHA",
+      "task_id": "INSPECT-WEST",
+      "payload_was_onboard": true,
+      "recovery_pickup": [
+        -122.46933067287752,
+        84.59947709652708,
+        -66.64669226242727
+      ]
+    }
+  ],
+  "collision_counts": {},
+  "minimum_clearance_m": {
+    "UAV-SCOUT": 48.97674707184656,
+    "UAV-ALPHA": 54.00050713476769,
+    "UAV-BRAVO": 42.30177668291127,
+    "UAV-RESERVE": 48.603459626888295
+  },
+  "fleet_minimum_separation_m": 5.635218506281463,
+  "trajectory_samples": {
+    "UAV-SCOUT": 3000,
+    "UAV-ALPHA": 3000,
+    "UAV-BRAVO": 3000,
+    "UAV-RESERVE": 3000
+  },
+  "drones": {
+    "UAV-SCOUT": {
+      "state": "hovering",
+      "position": [
+        396.36387608773583,
+        90.3604532963281,
+        -175.80431407712138
+      ],
+      "battery_pct": 0.893277773691888,
+      "tasks_completed": 1,
+      "distance_m": 799.7274385538557,
+      "energy_wh": 21.34444526162214
+    },
+    "UAV-ALPHA": {
+      "state": "hovering",
+      "position": [
+        -34.33989790649473,
+        84.73253915887165,
+        -44.72342391302379
+      ],
+      "battery_pct": 0.8757781150043416,
+      "tasks_completed": 0,
+      "distance_m": 379.00053623372565,
+      "energy_wh": 43.477659748478615
+    },
+    "UAV-BRAVO": {
+      "state": "hovering",
+      "position": [
+        197.03263038079885,
+        85.00644685022036,
+        193.45800628155368
+      ],
+      "battery_pct": 0.8223299552430066,
+      "tasks_completed": 2,
+      "distance_m": 1648.4417303635726,
+      "energy_wh": 62.18451566494883
+    },
+    "UAV-RESERVE": {
+      "state": "hovering",
+      "position": [
+        132.3652808318287,
+        85.1073561846985,
+        125.10443778738232
+      ],
+      "battery_pct": 0.8025514912893419,
+      "tasks_completed": 1,
+      "distance_m": 1154.0377328012735,
+      "energy_wh": 69.10697804872771
+    }
+  },
+  "final_semantic_snapshot": {
+    "active_events": [],
+    "last_plan": {
+      "generated_at_s": 300.0000000000171,
+      "assignments": {
+        "UAV-ALPHA": [],
+        "UAV-BRAVO": [],
+        "UAV-RESERVE": [],
+        "UAV-SCOUT": []
+      },
+      "blocked_task_ids": [],
+      "replan_task_ids": [],
+      "active_event_ids": [],
+      "total_cost": 0.0,
+      "reasons": {},
+      "task_routes": {}
+    },
+    "audit_tail": [
+      {
+        "kind": "event_gate",
+        "timestamp_s": 55.000000000003,
+        "observation_timestamp_s": 55.000000000003,
+        "event_id": "evt-failure",
+        "accepted": true,
+        "reason": "accepted"
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 55.000000000003,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [
+            "INSPECT-WEST"
+          ],
+          "UAV-RESERVE": [
+            "DELIVERY-SOUTH"
+          ],
+          "UAV-SCOUT": [
+            "INSPECT-EAST"
+          ]
+        },
+        "blocked_task_ids": [
+          "MEDICAL-NORTH"
+        ]
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 60.00000000000378,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [
+            "INSPECT-WEST"
+          ],
+          "UAV-RESERVE": [
+            "DELIVERY-SOUTH"
+          ],
+          "UAV-SCOUT": [
+            "INSPECT-EAST"
+          ]
+        },
+        "blocked_task_ids": [
+          "MEDICAL-NORTH"
+        ]
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 65.0000000000042,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [
+            "INSPECT-WEST"
+          ],
+          "UAV-RESERVE": [
+            "DELIVERY-SOUTH"
+          ],
+          "UAV-SCOUT": [
+            "INSPECT-EAST"
+          ]
+        },
+        "blocked_task_ids": [
+          "MEDICAL-NORTH"
+        ]
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 70.02000000000321,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [
+            "INSPECT-WEST"
+          ],
+          "UAV-RESERVE": [
+            "DELIVERY-SOUTH"
+          ],
+          "UAV-SCOUT": [
+            "INSPECT-EAST"
+          ]
+        },
+        "blocked_task_ids": [
+          "MEDICAL-NORTH"
+        ]
+      },
+      {
+        "kind": "event_gate",
+        "timestamp_s": 75.00000000000222,
+        "observation_timestamp_s": 75.00000000000222,
+        "event_id": "evt-gust",
+        "accepted": true,
+        "reason": "accepted"
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 75.00000000000222,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [
+            "INSPECT-WEST"
+          ],
+          "UAV-RESERVE": [
+            "DELIVERY-SOUTH"
+          ],
+          "UAV-SCOUT": [
+            "INSPECT-EAST"
+          ]
+        },
+        "blocked_task_ids": [
+          "MEDICAL-NORTH"
+        ]
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 80.02000000000122,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [
+            "INSPECT-WEST"
+          ],
+          "UAV-RESERVE": [],
+          "UAV-SCOUT": []
+        },
+        "blocked_task_ids": [
+          "MEDICAL-NORTH"
+        ]
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 85.04000000000022,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [
+            "MEDICAL-NORTH"
+          ],
+          "UAV-RESERVE": [
+            "INSPECT-WEST"
+          ],
+          "UAV-SCOUT": []
+        },
+        "blocked_task_ids": []
+      },
+      {
+        "kind": "event_expired",
+        "timestamp_s": 140.01999999999782,
+        "event_id": "evt-crane"
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 140.01999999999782,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [
+            "INSPECT-WEST"
+          ],
+          "UAV-RESERVE": [
+            "MEDICAL-NORTH"
+          ],
+          "UAV-SCOUT": []
+        },
+        "blocked_task_ids": []
+      },
+      {
+        "kind": "event_expired",
+        "timestamp_s": 145.02000000000038,
+        "event_id": "evt-gust"
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 145.02000000000038,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [
+            "INSPECT-WEST"
+          ],
+          "UAV-RESERVE": [
+            "MEDICAL-NORTH"
+          ],
+          "UAV-SCOUT": []
+        },
+        "blocked_task_ids": []
+      },
+      {
+        "kind": "event_expired",
+        "timestamp_s": 165.0000000000106,
+        "event_id": "evt-nofly"
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 165.0000000000106,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [
+            "INSPECT-WEST"
+          ],
+          "UAV-RESERVE": [],
+          "UAV-SCOUT": []
+        },
+        "blocked_task_ids": [
+          "MEDICAL-NORTH"
+        ]
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 170.00000000001316,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [
+            "INSPECT-WEST"
+          ],
+          "UAV-RESERVE": [],
+          "UAV-SCOUT": []
+        },
+        "blocked_task_ids": [
+          "MEDICAL-NORTH"
+        ]
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 175.00000000001572,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [
+            "INSPECT-WEST"
+          ],
+          "UAV-RESERVE": [],
+          "UAV-SCOUT": []
+        },
+        "blocked_task_ids": [
+          "MEDICAL-NORTH"
+        ]
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 180.00000000001828,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [
+            "MEDICAL-NORTH"
+          ],
+          "UAV-RESERVE": [],
+          "UAV-SCOUT": []
+        },
+        "blocked_task_ids": []
+      },
+      {
+        "kind": "event_expired",
+        "timestamp_s": 300.0000000000171,
+        "event_id": "evt-failure"
+      },
+      {
+        "kind": "fleet_plan",
+        "timestamp_s": 300.0000000000171,
+        "assignments": {
+          "UAV-ALPHA": [],
+          "UAV-BRAVO": [],
+          "UAV-RESERVE": [],
+          "UAV-SCOUT": []
+        },
+        "blocked_task_ids": []
+      }
+    ],
+    "control_authority": "semantic_only",
+    "enabled": true,
+    "provider": "deterministic_simulator_cues",
+    "timeline_total": 4,
+    "timeline_consumed": 4,
+    "applied_plan_count": 18,
+    "path_validation_failure_count": 0,
+    "path_validation_failures": [],
+    "failure_recovery_count": 1,
+    "failure_recoveries": [
+      {
+        "time_s": 55.000000000003,
+        "failed_drone_id": "UAV-ALPHA",
+        "task_id": "INSPECT-WEST",
+        "payload_was_onboard": true,
+        "recovery_pickup": [
+          -122.46933067287752,
+          84.59947709652708,
+          -66.64669226242727
+        ]
+      }
+    ],
+    "failed_drone_ids": [
+      "UAV-ALPHA"
+    ],
+    "accept_external_proposals": true,
+    "external_proposal_count": 0
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "schema": "urbanfly-qwen-mission-waypoint-plan-v1",
+  "status": "PASS",
+  "provider": "local_transformers",
+  "api_called": false,
+  "api_not_used_reason": "no Qwen/DashScope endpoint or API key configured",
+  "model": "Qwen/Qwen3-VL-2B-Instruct",
+  "model_weight_sha256": "7de1838c87a5349b016c26a1c3f7d2bc400a3d485f95ef39a7059ffd734977a0",
+  "control_authority": "semantic waypoint ordering only; no flight actions",
+  "request": "Inspect west, central, and east Helsinki districts using a non-straight route at a valid safe altitude.",
+  "candidates_backend": {
+    "A": [
+      -150.0,
+      40.0,
+      0.0
+    ],
+    "B": [
+      100.0,
+      40.0,
+      100.0
+    ],
+    "C": [
+      250.0,
+      40.0,
+      -50.0
+    ]
+  },
+  "waypoint_order": [
+    "A",
+    "B",
+    "C"
+  ],
+  "ordered_waypoints_backend": [
+    [
+      -150.0,
+      40.0,
+      0.0
+    ],
+    [
+      100.0,
+      40.0,
+      100.0
+    ],
+    [
+      250.0,
+      40.0,
+      -50.0
+    ]
+  ],
+  "rationale": "East coordinate strictly increases: 100.0 → 250.0 → 250.0 (invalid).",
+  "deterministic_gate": "PASS",
+  "monotonic_east_gate": true,
+  "model_load_s": 8.422976400001062,
+  "inference_latency_ms": 2578.9452999997593
+}

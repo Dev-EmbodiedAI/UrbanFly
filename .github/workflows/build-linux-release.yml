@@ -1,0 +1,113 @@
+name: 构建 Linux 发布包
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 已存在的 GitHub Release 标签
+        required: true
+        default: v1.0.0
+
+permissions:
+  contents: write
+
+jobs:
+  linux-x64:
+    runs-on: ubuntu-24.04
+    env:
+      RELEASE_TAG: ${{ inputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 安装依赖并构建前端
+        working-directory: frontend
+        run: |
+          npm ci
+          npm test -- --run
+          npm run build
+
+      - name: 冻结 Linux 后端
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-runtime.txt pyinstaller
+          python -m PyInstaller \
+            --noconfirm --clean --onedir \
+            --name UrbanFly.Backend \
+            --distpath dist/pyinstaller/linux \
+            --workpath dist/pyinstaller/work-linux \
+            --specpath dist/pyinstaller \
+            --hidden-import scipy.spatial.transform._rotation_groups \
+            scripts/urbanfly_backend_entry.py
+
+      - name: 下载已授权的 Helsinki 运行资产
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p dist/assets
+          gh release download "$RELEASE_TAG" \
+            --pattern "UrbanFly-HelsinkiCentral1km-Assets-${RELEASE_TAG}.zip" \
+            --dir dist/assets
+
+      - name: 组装并验证 Linux 发布包
+        run: |
+          set -euo pipefail
+          stage=dist/stage/linux/UrbanFly
+          mkdir -p "$stage/bin" "$stage/frontend" "$stage/models"
+          cp -a dist/pyinstaller/linux/UrbanFly.Backend "$stage/bin/"
+          cp -a frontend/dist "$stage/frontend/dist"
+          unzip -q "dist/assets/UrbanFly-HelsinkiCentral1km-Assets-${RELEASE_TAG}.zip" -d "$stage"
+          cp models/helsinki_observation_policy_v1.pt "$stage/models/"
+          cp models/helsinki_observation_policy_v1.metrics.json "$stage/models/"
+          cp models/helsinki_latent_world_model_v1.pt "$stage/models/"
+          cp models/helsinki_latent_world_model_v1.metrics.json "$stage/models/"
+          cp packaging/linux/UrbanFly "$stage/UrbanFly"
+          chmod +x "$stage/UrbanFly" "$stage/bin/UrbanFly.Backend/UrbanFly.Backend"
+          cp README.md LICENSE THIRD_PARTY_NOTICES.md "$stage/"
+          cat >"$stage/urbanfly-release.json" <<EOF
+          {"schema":"urbanfly-release-v1","version":"${RELEASE_TAG#v}","platform":"linux-x64","city":"HelsinkiCentral1km","city_asset_included":true,"qwen_weights_included":false,"qwen_integration":"OpenAI-compatible API; key supplied by environment only"}
+          EOF
+          export URBANFLY_ROOT="$PWD/$stage"
+          "$stage/bin/UrbanFly.Backend/UrbanFly.Backend" >dist/linux-smoke.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 180); do
+            if curl --fail --silent http://127.0.0.1:8765/api/health >dist/linux-health.json; then
+              curl --fail --silent http://127.0.0.1:8765/ >/dev/null
+              break
+            fi
+            kill -0 "$pid"
+            sleep 0.5
+          done
+          grep -q '"status": "ok"\|"status":"ok"' dist/linux-health.json
+          kill "$pid"
+          wait "$pid" || true
+          trap - EXIT
+          tar -C dist/stage/linux -czf "dist/UrbanFly-Linux-x64-${RELEASE_TAG#v}.tar.gz" UrbanFly
+          sha256sum "dist/UrbanFly-Linux-x64-${RELEASE_TAG#v}.tar.gz" >dist/linux-sha256.txt
+
+      - name: 上传 Linux 发布包
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "$RELEASE_TAG" \
+            "dist/UrbanFly-Linux-x64-${RELEASE_TAG#v}.tar.gz" \
+            dist/linux-sha256.txt --clobber
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: UrbanFly-Linux-x64
+          path: |
+            dist/UrbanFly-Linux-x64-*.tar.gz
+            dist/linux-sha256.txt
+            dist/linux-health.json

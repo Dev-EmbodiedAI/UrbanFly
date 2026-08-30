@@ -1,0 +1,27 @@
+{
+  "schema": "urbanfly-spatial-split-v1",
+  "seed": 20260731,
+  "tile_size_m": 250,
+  "buffer_m": 25,
+  "coordinate_frame": "nwu_horizontal_x_y",
+  "policy": "connected_train_and_test_regions; routes remain inside same-split buffered tile interiors",
+  "tiles": [
+    {"id":"673498a1","grid":[0,0],"split":"train","bounds_nwu_m":[[-500,-500],[-250,-250]],"route_inner_bounds_nwu_m":[[-475,-475],[-250,-250]]},
+    {"id":"673498a3","grid":[1,0],"split":"train","bounds_nwu_m":[[-250,-500],[0,-250]],"route_inner_bounds_nwu_m":[[-250,-475],[-25,-250]]},
+    {"id":"673498c1","grid":[2,0],"split":"validation","bounds_nwu_m":[[0,-500],[250,-250]],"route_inner_bounds_nwu_m":[[25,-475],[225,-275]]},
+    {"id":"673498c3","grid":[3,0],"split":"test","bounds_nwu_m":[[250,-500],[500,-250]],"route_inner_bounds_nwu_m":[[275,-475],[475,-250]]},
+    {"id":"672498b2","grid":[0,1],"split":"train","bounds_nwu_m":[[-500,-250],[-250,0]],"route_inner_bounds_nwu_m":[[-475,-250],[-250,0]]},
+    {"id":"672498b4","grid":[1,1],"split":"train","bounds_nwu_m":[[-250,-250],[0,0]],"route_inner_bounds_nwu_m":[[-250,-250],[0,0]]},
+    {"id":"672498d2","grid":[2,1],"split":"train","bounds_nwu_m":[[0,-250],[250,0]],"route_inner_bounds_nwu_m":[[0,-225],[225,0]]},
+    {"id":"672498d4","grid":[3,1],"split":"test","bounds_nwu_m":[[250,-250],[500,0]],"route_inner_bounds_nwu_m":[[275,-250],[475,0]]},
+    {"id":"672498b1","grid":[0,2],"split":"train","bounds_nwu_m":[[-500,0],[-250,250]],"route_inner_bounds_nwu_m":[[-475,0],[-250,250]]},
+    {"id":"672498b3","grid":[1,2],"split":"train","bounds_nwu_m":[[-250,0],[0,250]],"route_inner_bounds_nwu_m":[[-250,0],[0,250]]},
+    {"id":"672498d1","grid":[2,2],"split":"train","bounds_nwu_m":[[0,0],[250,250]],"route_inner_bounds_nwu_m":[[0,0],[225,225]]},
+    {"id":"672498d3","grid":[3,2],"split":"test","bounds_nwu_m":[[250,0],[500,250]],"route_inner_bounds_nwu_m":[[275,0],[475,250]]},
+    {"id":"672498a2","grid":[0,3],"split":"train","bounds_nwu_m":[[-500,250],[-250,500]],"route_inner_bounds_nwu_m":[[-475,250],[-250,475]]},
+    {"id":"672498a4","grid":[1,3],"split":"train","bounds_nwu_m":[[-250,250],[0,500]],"route_inner_bounds_nwu_m":[[-250,250],[-25,475]]},
+    {"id":"672498c2","grid":[2,3],"split":"validation","bounds_nwu_m":[[0,250],[250,500]],"route_inner_bounds_nwu_m":[[25,275],[225,475]]},
+    {"id":"672498c4","grid":[3,3],"split":"test","bounds_nwu_m":[[250,250],[500,500]],"route_inner_bounds_nwu_m":[[275,250],[475,475]]}
+  ],
+  "manifest_sha256": "69aea72b290367b60516f8773d93d7919679f2e1a18829e7ec787872e58751a9"
+}

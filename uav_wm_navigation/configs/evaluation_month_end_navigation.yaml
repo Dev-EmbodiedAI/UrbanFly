@@ -1,0 +1,71 @@
+experiment_id: urbanfly-month-end-navigation-v1
+protocol_version: 1
+methods:
+  - yopo
+  - yopo_dreamerv3
+  - yopo_jepa
+  - yopo_tdmpc2
+method_labels:
+  yopo: End-to-end planner
+  yopo_dreamerv3: Planner + Dreamer auxiliary module
+  yopo_jepa: Planner + JEPA auxiliary module
+  yopo_tdmpc2: Planner + TD-MPC2 auxiliary module
+
+# Every method receives the same map, route, seed, observation and candidate
+# set.  World models may only reorder those candidates.
+paired_key: [map, scenario, difficulty, seed]
+maps: [CityCentral1km]
+scenarios: [StreetCanyon, DynamicCrossing, MixedUrban]
+difficulties: [easy, medium, hard]
+seeds: [101, 202, 303]
+max_steps: 120
+
+primary_metrics:
+  sr:
+    name: navigation_success_rate
+    direction: higher
+    definition: final_position_within_goal_tolerance
+  ne_m:
+    name: navigation_error_metres
+    direction: lower
+    definition: euclidean_distance_final_position_to_goal
+  spl:
+    name: success_weighted_path_length
+    direction: higher
+    definition: success_times_reference_length_divided_by_max_reference_and_executed_length
+    reference: configured_route_polyline
+
+goal_tolerance_m: 3.0
+inference_timeout_ms: 180.0
+max_risk: 0.75
+mc_dropout_samples: 5
+bootstrap_seed: 20260731
+world_model_goal_lookahead_m: 10.0
+rerank_weights:
+  yopo: 1.0
+  collision: 4.0
+  progress: 1.0
+  clearance: 1.0
+  failure: 2.0
+  uncertainty: 1.0
+
+tdmpc2_horizon_steps: 15
+tdmpc2_discount: 0.97
+tdmpc2_risk_weight: 8.0
+
+safety:
+  max_speed_mps: 6.0
+  max_acceleration_mps2: 2.5
+  max_yaw_rate_rps: 1.0471975512
+  emergency_depth_m: 0.8
+  min_altitude_m: 0.5
+  max_altitude_m: 80.0
+  collision_debounce_steps: 2
+  execution_timeout_s: 1.0
+
+reporting:
+  include_all_registered_seeds: true
+  retain_failures: true
+  confidence_interval: 0.95
+  sr_interval: wilson
+  ne_spl_interval: episode_bootstrap

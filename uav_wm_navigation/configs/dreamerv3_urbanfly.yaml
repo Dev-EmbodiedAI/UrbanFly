@@ -1,0 +1,21 @@
+family: dreamerv3_style_rssm_assistant
+input_schema: urbanfly-world-model-v3
+runtime: pytorch_rssm_assistant
+implementation_status: rgbd_categorical_rssm_ready_official_actor_critic_supplement_pending
+observation:
+  modalities: [rgb, depth, proprioception, body_goal, previous_action]
+rssm:
+  type: categorical
+  parameter_target_millions: 50
+  imagination_horizon_steps: 15
+  imagination_horizon_seconds: 3.0
+training:
+  offline_pretrain: true
+  online_finetune: fixed_interaction_budget
+  actor_critic_required_only_for_full_dreamerv3_claim: true
+  primary_comparison: rerank_shared_yopo_15_candidates
+deployment:
+  action_dim: 4
+  action_frame: body_flu
+  honest_result_name: DreamerV3-style_RSSM_assisted_planning
+  require_checkpoint: true

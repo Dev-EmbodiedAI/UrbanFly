@@ -1,0 +1,30 @@
+format: hdf5-v2
+map: Town10HD
+sensor_hz: 5
+planner_hz: 5
+control_hz: 20
+rgb_hz: 2
+episode_duration_s: 10
+future_horizon: 5
+history: 4
+require_real_yopo: true
+required_candidate_count: 15
+seed: 20260723
+stages: {pilot: 48}
+scenarios: [StreetCanyon, IntersectionTurn, OccludedCrossing, DynamicCrossing, NarrowPassage, DenseMixedUrban]
+difficulties: [easy, medium, hard]
+behavior_policy: {yopo_argmin: 0.50, safe_topk: 0.25, hard_negative: 0.15, ttc_guided: 0.10}
+safety:
+  max_speed_mps: 5.0
+  max_acceleration_mps2: 4.0
+  max_yaw_rate_rps: 1.2
+  emergency_depth_m: 0.8
+  slow_depth_m: 3.0
+  collision_debounce_steps: 2
+quality_gates:
+  depth_valid_rate_min: 0.95
+  body_mask_contamination_max: 0.005
+  sensor_state_skew_p95_ms_max: 20
+  dynamic_replay_agreement_min: 0.95
+  max_selected_lattice_fraction: 0.35
+  dangerous_candidate_fraction: [0.10, 0.25]

@@ -1,0 +1,21 @@
+model: occflow
+history: 4
+depth_max_m: 20.0
+state_dim: 13
+trajectory_dim: 9
+trajectory_steps: 16
+latent_dim: 64
+future_steps: 5
+voxel_minimum_flu: [-4.0, -8.0, -3.0]
+voxel_maximum_flu: [20.0, 8.0, 5.0]
+voxel_resolution_m: 0.5
+occupancy_cache_dir: outputs/datasets/town10hd_live_pilot_v2_debug/occflow_cache
+dropout: 0.15
+mc_dropout_samples: 5
+batch_size: 2
+epochs: 20
+patience: 6
+learning_rate: 0.0003
+weight_decay: 0.0001
+positive_weight: 2.0
+loss_weights: {collision: 2.0, clearance: 1.0, progress: 1.0, failure: 1.0, ranking: 0.5, dynamics: 0.0, occupancy: 1.0, flow: 0.2}

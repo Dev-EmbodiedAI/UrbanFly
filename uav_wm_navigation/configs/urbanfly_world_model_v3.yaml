@@ -1,0 +1,66 @@
+schema: urbanfly-world-model-v3
+seed: 20260731
+single_uav_only: true
+
+timing:
+  physics_hz: 50
+  rgbd_hz: 10
+  policy_hz: 5
+  success_radius_m: 3.0
+  success_dwell_s: 2.0
+  maximum_episode_s: 180
+
+sensors:
+  rgb: {width: 640, height: 360, codec: jpeg, quality: 95}
+  depth: {clip_m: 120.0, codec: png_u16_lossless}
+  gold_test: {rgb: png_lossless, depth: float32}
+
+action:
+  frame: body_flu
+  normalized_range: [-1.0, 1.0]
+  physical_limits: {forward_mps: 6.0, lateral_mps: 6.0, vertical_mps: 3.0, yaw_rate_degrees_s: 60.0}
+
+split:
+  manifest: urbanfly_spatial_split_v1.json
+  manifest_sha256: 69aea72b290367b60516f8773d93d7919679f2e1a18829e7ec787872e58751a9
+  buffer_m: 25
+  prohibit_cross_split_routes: true
+
+collection:
+  calibration: {trajectories: 20, target_frames: 2000}
+  quick: {trajectories: 200, target_frames: 100000, counterfactual_branches: 10000}
+  formal: {trajectories: 3000, target_frames: 1500000, counterfactual_branches: 200000}
+  behavior_percent:
+    geometric_mpc_expert: 40
+    perturbed_expert: 25
+    active_near_miss: 20
+    failure_recovery: 10
+    random_exploration: 5
+  route_distance_bins_m: [[50, 150], [150, 300], [300, 600], [600, 900]]
+  route_manifest_quick: ../outputs/manifests/urbanfly_v3_quick200_routes.json
+  dynamic_actor_speed_mps: [1.0, 8.0]
+  state_row_group_size: 256
+  shard_samples: 1000
+
+storage:
+  code_and_manifests: git
+  dataset_and_checkpoints: dvc
+  object_store: s3_compatible
+  required_remote_capacity_tb: 2
+  required_local_cache_gb: 300
+
+quality_gates:
+  synchronization_error_ms_max: 110
+  corrupt_frame_rate_percent_max: 0.1
+  checksums_required_percent: 100
+  no_route_spatial_or_parent_leakage: true
+
+evaluation:
+  quick_routes: 120
+  groups: [id_train_tiles, unseen_tiles, appearance_sensor, dynamics, canyon_dynamic_stress]
+  routes_per_group: 24
+  primary_metrics: [SR, NE, SPL]
+  quick_seeds: [101, 202, 303]
+  formal_seeds: [101, 202, 303, 404, 505]
+  p95_control_latency_ms_max: 180
+  report_raw_and_shielded: true

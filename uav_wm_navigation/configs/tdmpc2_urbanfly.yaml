@@ -1,0 +1,22 @@
+family: tdmpc2_continuous_compact_smoke_only
+implementation_status: deprecated_for_formal_results_use_tdmpc2_visual_urbanfly_v3
+input_schema: urbanfly-world-model-v2
+latent_dim: 96
+planning:
+  horizon_steps: 15
+  horizon_seconds: 3.0
+  candidates: 512
+  elites: 64
+  cem_iterations: 5
+  discount: 0.97
+  p95_latency_target_ms: 150
+heads:
+  - latent_transition
+  - reward
+  - twin_q
+  - policy_prior
+  - cpa_risk
+deployment:
+  require_checkpoint: true
+  refuse_random_weights: true
+  precision: fp16

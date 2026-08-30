@@ -1,0 +1,44 @@
+backend: urbanfly_websocket
+websocket_url: ws://127.0.0.1:8765/ws
+urbanfly_scenario: single_uav_world_model
+vehicle_name: WM-UAV-01
+map: CityCentral1km
+scenario: StreetCanyon
+seed: 20260731
+
+# Navigation coordinates are [north, west, up].  The adapter converts them
+# explicitly to UrbanFly browser-world [x, up, z].
+flight_start_nwu: [0.0, 0.0, 15.0]
+goal_nwu: [140.0, 80.0, 25.0]
+route_nwu:
+  - [0.0, 0.0, 15.0]
+  - [140.0, 0.0, 25.0]
+  - [170.0, 45.0, 27.0]
+  - [140.0, 80.0, 25.0]
+
+initial_yaw_degrees: 0.0
+goal_tolerance_m: 3.0
+control_dt: 0.1
+planning_prefix_s: 0.2
+trajectory_position_kp: 1.2
+minimum_altitude_nwu: 2.0
+maximum_altitude_nwu: 120.0
+bounds_min_nwu: [-500.0, -500.0, 2.0]
+bounds_max_nwu: [500.0, 500.0, 120.0]
+
+policy_family: yopo_direct
+backend_safety_shield: true
+connection_timeout_s: 10.0
+sensor_timeout_s: 12.0
+command_timeout_s: 4.0
+
+route_consistency:
+  enabled: false
+
+visualization_fps: 5.0
+visualization_acceptance:
+  minimum_frames: 1
+  minimum_path_length_m: 0.0
+  maximum_altitude_error_p95_m: 120.0
+  maximum_depth_saturated_fraction: 1.0
+  minimum_near_depth_fraction: 0.0

@@ -1,0 +1,28 @@
+schema: urbanfly-helsinki-dataset-v1
+scene_id: HelsinkiCentral1km
+collection_mode: expert
+policy_frequency_hz: 10.0
+local_goal_lookahead_m: 20.0
+control_lookahead_m: 6.0
+maximum_speed_mps: 6.0
+maximum_vertical_speed_mps: 1.5
+goal_tolerance_m: 2.0
+spatial_split: train
+spatial_guard_m: 20.0
+smoke_seed: 20261001
+dynamic_actor_density: 0.0
+backend_safety_shield: true
+
+coordinate_convention:
+  canonical_world: ENU
+  canonical_body: FLU
+  camera: RDF
+  quaternion_order: xyzw
+  source_asset_axes: [easting, northing, elevation]
+  renderer_backend_axes: [east, up, south]
+  renderer_north_axis: negative_z
+
+rollout_modes_reserved:
+  - expert
+  - perturbed_expert
+  - recovery

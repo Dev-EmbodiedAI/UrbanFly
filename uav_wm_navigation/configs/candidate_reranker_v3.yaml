@@ -1,0 +1,18 @@
+schema: urbanfly-candidate-reranker-v3
+selection: validation_only_then_frozen_before_test
+lexicographic_validation_objective: [minimize_collision_and_near_miss, maximize_SR, maximize_SPL]
+weights:
+  yopo: 1.0
+  collision: 4.0
+  cpa: 2.0
+  failure: 2.0
+  uncertainty: 1.0
+  progress: 1.0
+  clearance: 1.0
+  value: 0.5
+limits:
+  model_timeout_ms: 150
+  high_risk_fallback_threshold: 0.75
+audit:
+  same_15_yopo_candidates_for_all_methods: true
+  no_test_set_weight_selection: true

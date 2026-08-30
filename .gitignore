@@ -1,0 +1,62 @@
+# Editors and agent-local state
+.claude/
+.agents/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# JavaScript
+frontend/node_modules/
+frontend/dist/
+npm-debug.log*
+*.log
+
+# .NET
+desktop/**/bin/
+desktop/**/obj/
+desktop/publish/
+
+# Builds and runtime scratch
+dist/
+tmp/
+outputs/runtime_logs/
+outputs/runtime_recordings/
+*.partial
+
+# Large licensed/runtime data are distributed as GitHub Release assets.
+data/
+*.h5
+*.npz
+*.npy
+*.glb
+*.obj
+*.mtl
+
+# Foundation-model weights are never published by this repository.
+models/qwen3_vl_2b_instruct/
+*.safetensors
+
+# Large experiment products are release assets, not Git history.
+*.mp4
+*.avi
+*.mkv
+*.zip
+*.tar.gz
+
+# Personal thesis/reference material is not part of the software release.
+硕士毕业论文整理/
+references/
+thesis/
+uav_wm_navigation/reports/
+configs/wan_*.txt

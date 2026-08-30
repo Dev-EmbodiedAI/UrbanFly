@@ -1,0 +1,42 @@
+schema: urbanfly-world-model-v3
+family: tdmpc2_visual
+status: formal_rgbd_training
+seed: 20260731
+
+observation:
+  rgb_size: [128, 224]
+  depth_clip_m: 120.0
+  proprio_dim: 16
+  sequence_length: 4
+  sensor_hz: 10
+
+model:
+  latent_dim: 192
+  action_dim: 4
+  planning_horizon_steps: 15
+  planning_horizon_s: 3.0
+  candidate_mode: shared_yopo_15_rerank
+  auxiliary_heads: [collision_risk, cpa_risk, clearance, progress, continuation, uncertainty, state_1s_2s_3s]
+
+training:
+  batch_size: 32
+  learning_rate: 0.0003
+  discount: 0.97
+  target_tau: 0.01
+  precision: bf16
+  gradient_clip_norm: 20.0
+  seeds: [101, 202, 303]
+
+planning:
+  native_cem_supplement_only: true
+  candidates: 512
+  elites: 64
+  iterations: 5
+  risk_weight: 8.0
+  p95_model_latency_target_ms: 150
+  p95_end_to_end_latency_target_ms: 180
+
+provenance:
+  compact_27d_loader_allowed: false
+  random_checkpoint_deployment_allowed: false
+  privileged_fields_are_inputs: false

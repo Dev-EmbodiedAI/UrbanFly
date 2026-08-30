@@ -1,0 +1,16 @@
+methods: [yopo, yopo_ttc, yopo_dreamerv3, yopo_jepa, oracle]
+seeds: [0, 1, 2]
+goal_tolerance_m: 1.0
+inference_timeout_ms: 100.0
+max_risk: 0.75
+world_model_goal_lookahead_m: 10.0
+rerank_weights: {yopo: 1.0, collision: 4.0, progress: 1.0, clearance: 1.0, failure: 2.0, uncertainty: 1.0}
+safety:
+  max_speed_mps: 3.0
+  max_acceleration_mps2: 2.5
+  max_yaw_rate_rps: 1.0
+  emergency_depth_m: 0.8
+  min_altitude_m: 0.5
+  max_altitude_m: 20.0
+  collision_debounce_steps: 2
+  execution_timeout_s: 1.0

@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BACKEND="$ROOT_DIR/bin/UrbanFly.Backend/UrbanFly.Backend"
+export URBANFLY_ROOT="$ROOT_DIR"
+
+if [[ ! -x "$BACKEND" ]]; then
+  echo "UrbanFly 后端不存在或不可执行：$BACKEND" >&2
+  exit 1
+fi
+
+mkdir -p "$ROOT_DIR/outputs/runtime_logs"
+LOG="$ROOT_DIR/outputs/runtime_logs/backend.log"
+"$BACKEND" >>"$LOG" 2>&1 &
+BACKEND_PID=$!
+trap 'kill "$BACKEND_PID" 2>/dev/null || true' EXIT INT TERM
+
+for _ in $(seq 1 120); do
+  if curl --fail --silent http://127.0.0.1:8765/api/health >/dev/null; then
+    if command -v xdg-open >/dev/null 2>&1; then
+      xdg-open http://127.0.0.1:8765/ >/dev/null 2>&1 || true
+    fi
+    echo "UrbanFly 已启动，界面地址：http://127.0.0.1:8765/"
+    wait "$BACKEND_PID"
+    exit $?
+  fi
+  if ! kill -0 "$BACKEND_PID" 2>/dev/null; then
+    echo "UrbanFly 后端在启动过程中退出，请查看：$LOG" >&2
+    exit 1
+  fi
+  sleep 0.5
+done
+
+echo "UrbanFly 健康检查超时，请查看：$LOG" >&2
+exit 1

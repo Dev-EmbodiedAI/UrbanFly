@@ -1,0 +1,42 @@
+{
+  "schema": "urbanfly-helsinki-canonical-dataset-v1-qa",
+  "status": "PASS",
+  "episode_count": 100,
+  "unique_contiguous_episode_ids": true,
+  "transition_count": 39767,
+  "task_counts": {
+    "building_blocked": 20,
+    "ground_to_rooftop": 20,
+    "rooftop_to_ground": 20,
+    "rooftop_to_rooftop": 20,
+    "street_canyon": 20
+  },
+  "all_hdf5_readback_pass": true,
+  "stale_action_count": 0,
+  "collision_count": 0,
+  "success_count": 100,
+  "partial_count": 0,
+  "source_metrics": {
+    "clearance_m": {
+      "minimum": 4.288824081420898,
+      "median": 8.994842529296875
+    },
+    "dt_s": {
+      "mean": 0.12323786053763171,
+      "p95": 0.29999999999999716,
+      "maximum": 0.7000000000000002
+    },
+    "reset": {
+      "expected_total_episode_boundaries": 99,
+      "automatic_reset_passes": 93,
+      "fresh_boundary_passes": 6
+    }
+  },
+  "content_bytes": 1030464037,
+  "manifest": "D:\\AI\\UrbanFly\\outputs\\helsinki_dataset_v1\\main_100_zero_stale_v1\\dataset_manifest.json",
+  "source_hdf5_cleanup": "PASS",
+  "source_hdf5_links_or_files_removed": 147,
+  "source_hdf5_apparent_bytes_unlinked": 1225018407,
+  "post_cleanup_canonical_hdf5_count": 100,
+  "post_cleanup_partial_count": 0
+}

@@ -1,0 +1,267 @@
+{
+  "status": "ONLINE_SMOKE_PASS",
+  "source_qa": "D:\\AI\\UrbanFly\\outputs\\helsinki_dataset_v1\\main_100_zero_stale_v1\\dataset_qa.json",
+  "split": {
+    "kind": "held-out episode tail; not an official spatial-unseen split",
+    "train_episode_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79
+    ],
+    "validation_episode_indices": [
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99
+    ],
+    "train_task_counts": {
+      "building_blocked": 16,
+      "ground_to_rooftop": 16,
+      "rooftop_to_ground": 16,
+      "rooftop_to_rooftop": 16,
+      "street_canyon": 16
+    },
+    "validation_task_counts": {
+      "building_blocked": 4,
+      "ground_to_rooftop": 4,
+      "rooftop_to_ground": 4,
+      "rooftop_to_rooftop": 4,
+      "street_canyon": 4
+    }
+  },
+  "target": "actions/commanded_body_flu",
+  "policy_inputs_exclude_privileged": true,
+  "parameters": 253412,
+  "best_epoch": 7,
+  "epochs": 8,
+  "device": "cuda",
+  "peak_vram_gb": 0.1526632308959961,
+  "action_mean": [
+    3.738800048828125,
+    0.008750949054956436,
+    0.007374975830316544,
+    0.004146904684603214
+  ],
+  "action_std": [
+    0.6577328443527222,
+    0.23811742663383484,
+    0.5232512354850769,
+    0.1012984961271286
+  ],
+  "validation": {
+    "samples": 8852,
+    "mae": {
+      "forward_mps": 0.0452244378596046,
+      "left_mps": 0.022540941324389687,
+      "up_mps": 0.03041561080881012,
+      "yaw_rate_rps": 0.010519406448930192
+    },
+    "normalized_rmse": {
+      "forward_mps": 0.1269072142651033,
+      "left_mps": 0.13119877156034745,
+      "up_mps": 0.10662236076863046,
+      "yaw_rate_rps": 0.13176422932739731
+    },
+    "mean_action_baseline_mae": {
+      "forward_mps": 0.3126341114203638,
+      "left_mps": 0.11324027365673682,
+      "up_mps": 0.32612380114713513,
+      "yaw_rate_rps": 0.04795379408622995
+    },
+    "relative_mae_to_mean_baseline": 0.1358836519156405,
+    "meaningful_yaw_sign_accuracy": 1.0,
+    "meaningful_yaw_samples": 1976,
+    "inference_latency_ms_per_sample_mean": 0.037679671761419765,
+    "inference_latency_ms_per_sample_p95": 0.06529609374581469
+  },
+  "history": [
+    {
+      "epoch": 1.0,
+      "train_loss": 0.2210771687277,
+      "validation_relative_mae": 0.3350265381198715,
+      "validation_yaw_sign_accuracy": 0.9989878542510121,
+      "elapsed_s": 35.3746529
+    },
+    {
+      "epoch": 2.0,
+      "train_loss": 0.06505870653041335,
+      "validation_relative_mae": 0.29041429218933457,
+      "validation_yaw_sign_accuracy": 1.0,
+      "elapsed_s": 71.20779319999929
+    },
+    {
+      "epoch": 3.0,
+      "train_loss": 0.04041126540601591,
+      "validation_relative_mae": 0.20647100713398295,
+      "validation_yaw_sign_accuracy": 1.0,
+      "elapsed_s": 107.64365689999977
+    },
+    {
+      "epoch": 4.0,
+      "train_loss": 0.03301956641135161,
+      "validation_relative_mae": 0.18957191929594128,
+      "validation_yaw_sign_accuracy": 1.0,
+      "elapsed_s": 143.83257129999947
+    },
+    {
+      "epoch": 5.0,
+      "train_loss": 0.03046753286891205,
+      "validation_relative_mae": 0.16244107970175334,
+      "validation_yaw_sign_accuracy": 1.0,
+      "elapsed_s": 181.06205380000029
+    },
+    {
+      "epoch": 6.0,
+      "train_loss": 0.028496372794692384,
+      "validation_relative_mae": 0.15455130632482206,
+      "validation_yaw_sign_accuracy": 1.0,
+      "elapsed_s": 216.17898380000042
+    },
+    {
+      "epoch": 7.0,
+      "train_loss": 0.027786593789154324,
+      "validation_relative_mae": 0.1358836519156405,
+      "validation_yaw_sign_accuracy": 1.0,
+      "elapsed_s": 250.3451702000002
+    },
+    {
+      "epoch": 8.0,
+      "train_loss": 0.025266541111638934,
+      "validation_relative_mae": 0.14311074183041983,
+      "validation_yaw_sign_accuracy": 1.0,
+      "elapsed_s": 284.7911227000004
+    }
+  ],
+  "online_validation": {
+    "schema": "urbanfly-helsinki-observation-policy-online-qa-summary-v1",
+    "status": "PASS",
+    "policy_wrapper": "learned RGB-D/public-state action plus transparent Local-Goal terminal capture inside final 8 m; backend safety shield enabled",
+    "goal_tolerance_m": 3.0,
+    "episode_indices": [80, 81, 82, 83, 84],
+    "task_types": [
+      "building_blocked",
+      "street_canyon",
+      "rooftop_to_ground",
+      "ground_to_rooftop",
+      "rooftop_to_rooftop"
+    ],
+    "episodes": 5,
+    "successes": 5,
+    "collisions": 0,
+    "stale_actions": 0,
+    "steps": 1778,
+    "maximum_cross_track_error_m": 6.823605580201806,
+    "safety_interventions": 0,
+    "inference_latency_ms": {
+      "mean": 4.558579696283209,
+      "p95": 7.008799998948234,
+      "maximum": 269.5917000000918
+    },
+    "per_episode": [
+      {"episode_index": 80, "task_type": "building_blocked", "steps": 269, "minimum_goal_distance_m": 2.82704382407847, "maximum_cross_track_error_m": 5.411453291997015},
+      {"episode_index": 81, "task_type": "street_canyon", "steps": 186, "minimum_goal_distance_m": 2.9267200792124357, "maximum_cross_track_error_m": 5.333528302838074},
+      {"episode_index": 82, "task_type": "rooftop_to_ground", "steps": 502, "minimum_goal_distance_m": 2.973290404542009, "maximum_cross_track_error_m": 6.823605580201806},
+      {"episode_index": 83, "task_type": "ground_to_rooftop", "steps": 367, "minimum_goal_distance_m": 2.8788472825720732, "maximum_cross_track_error_m": 4.433964901501558},
+      {"episode_index": 84, "task_type": "rooftop_to_rooftop", "steps": 454, "minimum_goal_distance_m": 2.8413090268951486, "maximum_cross_track_error_m": 6.119837432725224}
+    ]
+  },
+  "model_sha256": "ef39c5f8184f99abdc55fcd6b62250974d081f0742ce42f49af4325ea343c1dc",
+  "limitations": [
+    "Online validation is a five-episode held-out-route smoke, not a 100-episode learned-policy QA",
+    "NOT TESTED on a second city or appearance domain",
+    "100 source episodes are all labelled train in Dataset v1 metadata"
+  ]
+}

@@ -1,0 +1,9 @@
+episodes: 8
+steps_per_episode: 30
+future_horizon: 5
+history: 4
+format: hdf5
+rgb: false
+seed: 7
+scenarios: [StaticObstacle, OccludedCrossing, DynamicCrossing, NarrowPassage, SensorCorruption, MixedUrban]
+

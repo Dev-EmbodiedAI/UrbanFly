@@ -1,0 +1,10 @@
+yopo_root: D:/AI/UrbanFly/YOPO-YOPO-Simple/YOPO
+checkpoint: D:/AI/UrbanFly/YOPO-YOPO-Simple/YOPO/saved/YOPO_1/epoch50.pth
+device: cuda
+velocity: 4.5
+horizon_steps: 21
+depth_max_m: 20.0
+min_depth_m: 0.8
+use_measured_acceleration: false
+plan_from_reference: true
+reference_reset_distance_m: 0.5

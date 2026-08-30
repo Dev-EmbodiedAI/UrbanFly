@@ -1,0 +1,23 @@
+family: arr_fly_asymmetric_ppo
+role: non_world_model_safety_baseline
+input_schema: urbanfly-world-model-v3
+implementation_status: cnn_tcn_asymmetric_actor_critic_and_ppo_loss_ready_training_required
+implementation: ARRFlyActorCritic
+actor_observation:
+  depth_history:
+    frames: 15
+    azimuth_bins: 34
+    elevation_bins: 6
+  body_goal: true
+  body_velocity: true
+critic_privileged:
+  actor_states: true
+  cpa_future_risk_map: true
+cpa:
+  horizon_seconds: 3.0
+  safe_radius_m: 4.0
+  beta: 2.0
+  azimuth_pooling: logsumexp
+deployment:
+  actor_uses_privileged_fields: false
+  action_dim: 4

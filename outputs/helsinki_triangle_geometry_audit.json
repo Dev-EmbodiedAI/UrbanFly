@@ -1,0 +1,502 @@
+{
+  "triangle_mesh_source": "D:\\AI\\UrbanFly\\data\\helsinki_mesh\\HelsinkiCentral1km\\collision\\HelsinkiCentral1km_collision_L18.glb",
+  "triangles": 307980,
+  "vertices": 301037,
+  "watertight": false,
+  "acceleration_structure": "trimesh triangles_tree (libspatialindex R-tree BVH/AABB index)",
+  "index_build_time_s": 1.4647896999995282,
+  "building": {
+    "samples": 300,
+    "median_heightmap_surface_to_triangle_distance_m": 0.43372301813453124,
+    "p95_heightmap_surface_to_triangle_distance_m": 1.6904014896005521,
+    "within_0p75m_ratio": 0.7266666666666667,
+    "within_2m_ratio": 0.9666666666666667,
+    "verdict": "PASS",
+    "note": "0.5 m heightmap is conservative raster coverage, so cell maxima need not lie exactly on a triangle"
+  },
+  "bridge": {
+    "candidate_count": 91,
+    "examples": [
+      {
+        "position": [
+          -430.0,
+          5.7085,
+          380.0
+        ],
+        "lower_surface_m": -0.266,
+        "upper_surface_m": 11.683,
+        "gap_m": 11.949,
+        "triangle_distance_m": 5.693272793375502,
+        "heightmap_surface_m": 43.706298828125,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": true,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -450.0,
+          5.546,
+          380.0
+        ],
+        "lower_surface_m": -0.267,
+        "upper_surface_m": 11.359,
+        "gap_m": 11.626,
+        "triangle_distance_m": 2.993115573728795,
+        "heightmap_surface_m": 27.20648765563965,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": false,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          120.0,
+          5.91,
+          -270.0
+        ],
+        "lower_surface_m": 0.381,
+        "upper_surface_m": 11.439,
+        "gap_m": 11.058,
+        "triangle_distance_m": 5.056769134930085,
+        "heightmap_surface_m": 11.56363582611084,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": true,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          120.0,
+          5.3580000000000005,
+          -280.0
+        ],
+        "lower_surface_m": 0.079,
+        "upper_surface_m": 10.637,
+        "gap_m": 10.558,
+        "triangle_distance_m": 0.9900621780627411,
+        "heightmap_surface_m": 10.875372886657715,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": false,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -430.0,
+          4.786,
+          390.0
+        ],
+        "lower_surface_m": -0.268,
+        "upper_surface_m": 9.84,
+        "gap_m": 10.108,
+        "triangle_distance_m": 4.014918688533476,
+        "heightmap_surface_m": 27.164155960083008,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": true,
+          "north_south": false
+        }
+      },
+      {
+        "position": [
+          0.0,
+          5.584,
+          -270.0
+        ],
+        "lower_surface_m": 0.783,
+        "upper_surface_m": 10.385,
+        "gap_m": 9.602,
+        "triangle_distance_m": 2.2823678336078475,
+        "heightmap_surface_m": 11.61783504486084,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": true,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -80.0,
+          6.572,
+          -160.0
+        ],
+        "lower_surface_m": 1.83,
+        "upper_surface_m": 11.314,
+        "gap_m": 9.484,
+        "triangle_distance_m": 1.7779208751373008,
+        "heightmap_surface_m": 11.954954147338867,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": false,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -30.0,
+          4.711,
+          -250.0
+        ],
+        "lower_surface_m": 0.108,
+        "upper_surface_m": 9.314,
+        "gap_m": 9.206,
+        "triangle_distance_m": 2.56051489681075,
+        "heightmap_surface_m": 31.860986709594727,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": true,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -30.0,
+          4.3335,
+          -240.0
+        ],
+        "lower_surface_m": -0.269,
+        "upper_surface_m": 8.936,
+        "gap_m": 9.205,
+        "triangle_distance_m": 4.067875663588313,
+        "heightmap_surface_m": 26.47237205505371,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": true,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -440.0,
+          3.995,
+          390.0
+        ],
+        "lower_surface_m": -0.263,
+        "upper_surface_m": 8.253,
+        "gap_m": 8.516,
+        "triangle_distance_m": 2.096522668074177,
+        "heightmap_surface_m": 20.74308967590332,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": false,
+          "north_south": true
+        }
+      }
+    ],
+    "verdict": "PASS",
+    "note": "geometric cavity classification; no semantic bridge labels exist in the source asset"
+  },
+  "overhang": {
+    "candidate_count": 126,
+    "examples": [
+      {
+        "position": [
+          -450.0,
+          13.186,
+          360.0
+        ],
+        "lower_surface_m": -0.266,
+        "upper_surface_m": 26.638,
+        "gap_m": 26.904000000000003,
+        "triangle_distance_m": 1.44200871731022,
+        "heightmap_surface_m": 26.81047248840332,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": true,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -450.0,
+          12.999,
+          370.0
+        ],
+        "lower_surface_m": -0.267,
+        "upper_surface_m": 26.265,
+        "gap_m": 26.532,
+        "triangle_distance_m": 5.329424604168347,
+        "heightmap_surface_m": 26.31268882751465,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": true,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -430.0,
+          24.218,
+          380.0
+        ],
+        "lower_surface_m": 11.683,
+        "upper_surface_m": 36.753,
+        "gap_m": 25.07,
+        "triangle_distance_m": 2.009522796604107,
+        "heightmap_surface_m": 43.706298828125,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": true,
+          "north_south": false
+        }
+      },
+      {
+        "position": [
+          -20.0,
+          11.9335,
+          -230.0
+        ],
+        "lower_surface_m": -0.269,
+        "upper_surface_m": 24.136,
+        "gap_m": 24.404999999999998,
+        "triangle_distance_m": 3.4134834696525735,
+        "heightmap_surface_m": 24.683334350585938,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": true,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -410.0,
+          10.392,
+          390.0
+        ],
+        "lower_surface_m": -0.296,
+        "upper_surface_m": 21.08,
+        "gap_m": 21.375999999999998,
+        "triangle_distance_m": 2.8284016974639252,
+        "heightmap_surface_m": 26.494525909423828,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": true,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -410.0,
+          9.804,
+          400.0
+        ],
+        "lower_surface_m": -0.293,
+        "upper_surface_m": 19.901,
+        "gap_m": 20.194,
+        "triangle_distance_m": 2.9781916363365806,
+        "heightmap_surface_m": 20.04632568359375,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": true,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -410.0,
+          12.326,
+          410.0
+        ],
+        "lower_surface_m": 2.524,
+        "upper_surface_m": 22.128,
+        "gap_m": 19.604,
+        "triangle_distance_m": 3.190766068982951,
+        "heightmap_surface_m": 22.62885093688965,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": false,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -400.0,
+          13.1205,
+          390.0
+        ],
+        "lower_surface_m": 3.758,
+        "upper_surface_m": 22.483,
+        "gap_m": 18.725,
+        "triangle_distance_m": 2.8714375948667388,
+        "heightmap_surface_m": 22.58270263671875,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": false,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -10.0,
+          14.6405,
+          -210.0
+        ],
+        "lower_surface_m": 5.287,
+        "upper_surface_m": 23.994,
+        "gap_m": 18.707,
+        "triangle_distance_m": 4.257952425343282,
+        "heightmap_surface_m": 24.281808853149414,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": false,
+          "north_south": true
+        }
+      },
+      {
+        "position": [
+          -30.0,
+          18.114,
+          -250.0
+        ],
+        "lower_surface_m": 9.314,
+        "upper_surface_m": 26.914,
+        "gap_m": 17.6,
+        "triangle_distance_m": 4.843751304691442,
+        "heightmap_surface_m": 31.860986709594727,
+        "heightmap_treats_midpoint_as_occupied": true,
+        "horizontal_free_axes": {
+          "east_west": true,
+          "north_south": true
+        }
+      }
+    ],
+    "verdict": "PASS",
+    "note": "geometric under-surface cavity, not a semantic asset label"
+  },
+  "thin_structure": {
+    "heightmap_miss_candidates": 20,
+    "examples": [
+      {
+        "triangle_index": 333,
+        "centroid": [
+          -465.79969278971356,
+          2.309443553288778,
+          376.5138346354167
+        ],
+        "triangle_area_m2": 0.03179374775863598,
+        "heightmap_surface_m": -0.26253581047058105,
+        "heightmap_vertical_gap_m": 2.571979363759359,
+        "triangle_detected": true
+      },
+      {
+        "triangle_index": 342,
+        "centroid": [
+          -465.68524169921875,
+          2.1374250650405884,
+          376.62005615234375
+        ],
+        "triangle_area_m2": 0.010119481104414445,
+        "heightmap_surface_m": -0.26253581047058105,
+        "heightmap_vertical_gap_m": 2.3999608755111694,
+        "triangle_detected": true
+      },
+      {
+        "triangle_index": 419,
+        "centroid": [
+          -445.57215372721356,
+          2.0379158655802407,
+          390.1866760253906
+        ],
+        "triangle_area_m2": 0.015502472343358198,
+        "heightmap_surface_m": -0.25804296135902405,
+        "heightmap_vertical_gap_m": 2.295958826939265,
+        "triangle_detected": true
+      },
+      {
+        "triangle_index": 475,
+        "centroid": [
+          -445.7000325520833,
+          2.0393428007761636,
+          390.1015930175781
+        ],
+        "triangle_area_m2": 0.015347282614496598,
+        "heightmap_surface_m": -0.25804296135902405,
+        "heightmap_vertical_gap_m": 2.2973857621351876,
+        "triangle_detected": true
+      },
+      {
+        "triangle_index": 477,
+        "centroid": [
+          -445.52808634440106,
+          2.1134589513142905,
+          390.19603474934894
+        ],
+        "triangle_area_m2": 0.01936335694961053,
+        "heightmap_surface_m": -0.25804296135902405,
+        "heightmap_vertical_gap_m": 2.3715019126733146,
+        "triangle_detected": true
+      },
+      {
+        "triangle_index": 875,
+        "centroid": [
+          -437.0373026529948,
+          27.111111958821613,
+          387.643310546875
+        ],
+        "triangle_area_m2": 0.002033121893468473,
+        "heightmap_surface_m": 23.32585334777832,
+        "heightmap_vertical_gap_m": 3.785258611043293,
+        "triangle_detected": true
+      },
+      {
+        "triangle_index": 876,
+        "centroid": [
+          -437.0373026529948,
+          27.141462326049805,
+          387.64122517903644
+        ],
+        "triangle_area_m2": 0.004060013019979267,
+        "heightmap_surface_m": 23.32585334777832,
+        "heightmap_vertical_gap_m": 3.8156089782714844,
+        "triangle_detected": true
+      },
+      {
+        "triangle_index": 918,
+        "centroid": [
+          -437.0373026529948,
+          27.157265345255535,
+          387.6314290364583
+        ],
+        "triangle_area_m2": 0.0018439527199894698,
+        "heightmap_surface_m": 23.32585334777832,
+        "heightmap_vertical_gap_m": 3.8314119974772147,
+        "triangle_detected": true
+      },
+      {
+        "triangle_index": 3265,
+        "centroid": [
+          -371.9273986816406,
+          2.015072464942932,
+          441.06517537434894
+        ],
+        "triangle_area_m2": 0.010598267729614613,
+        "heightmap_surface_m": -0.2626098394393921,
+        "heightmap_vertical_gap_m": 2.277682304382324,
+        "triangle_detected": true
+      },
+      {
+        "triangle_index": 3269,
+        "centroid": [
+          -371.43735758463544,
+          2.0349597136179605,
+          441.0480550130208
+        ],
+        "triangle_area_m2": 0.013285476771648923,
+        "heightmap_surface_m": -0.2626098394393921,
+        "heightmap_vertical_gap_m": 2.2975695530573526,
+        "triangle_detected": true
+      }
+    ],
+    "verdict": "PASS"
+  },
+  "tree": {
+    "verdict": "LIMITATION",
+    "note": "TREE COLLISION COMPLETENESS NOT GUARANTEED: photogrammetry mesh has no semantic vegetation inventory"
+  },
+  "inside_outside_limitation": "mesh is non-watertight; distance is unsigned surface distance. Swept validation is reliable for trajectories starting in known free space, but arbitrary deep-inside point classification is not guaranteed."
+}

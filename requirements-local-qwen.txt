@@ -1,0 +1,5 @@
+# Optional historical/offline reproduction only. Not needed by the release.
+-r requirements.txt
+transformers>=5.16.1
+accelerate>=1.14.0
+qwen-vl-utils>=0.0.14

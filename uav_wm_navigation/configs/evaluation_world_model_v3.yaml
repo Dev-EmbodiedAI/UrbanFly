@@ -1,0 +1,29 @@
+schema: urbanfly-paired-evaluation-config-v3
+candidate_count: 15
+inference_timeout_ms_v3: 150
+end_to_end_timeout_ms: 180
+max_risk: 0.75
+bootstrap_seed: 20260831
+
+# Frozen on validation routes before test execution. Changing this mapping
+# requires a new evaluation manifest hash.
+rerank_weights_v3:
+  yopo: 1.0
+  collision: 4.0
+  cpa: 2.0
+  failure: 2.0
+  uncertainty: 1.0
+  progress: 1.0
+  clearance: 1.0
+  value: 0.5
+
+success:
+  radius_m: 3.0
+  dwell_s: 2.0
+  collision_free: true
+
+selection_rule:
+  primary: minimize_collision_and_near_miss
+  secondary: maximize_sr
+  tertiary: maximize_spl
+  test_set_selection_forbidden: true

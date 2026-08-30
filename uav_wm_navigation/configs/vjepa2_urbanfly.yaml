@@ -1,0 +1,25 @@
+family: vjepa2_1_uav_action_conditioned
+input_schema: urbanfly-world-model-v3
+implementation_status: official_encoder_adapter_ready_weights_required
+encoder:
+  source: official_meta_vjepa2_torch_hub
+  repository: facebookresearch/vjepa2
+  model: vjepa2_1_vit_large_384
+  checkpoint_key: ema_encoder
+  resolution: 384
+  parameters: 300M
+  variants:
+    - frozen
+    - last_four_layers_lora
+    - random_initialization
+  do_not_use_robot_action_conditioner: true
+predictor:
+  implementation: UAVActionConditionedJEPAPredictor
+  condition_on: [rgb_video, depth, continuous_body_action, proprioception, body_goal]
+  heads: [collision, failure, clearance, progress, reward, cpa_risk, terminal_value, uncertainty]
+planning:
+  horizon_steps: 15
+  generate_pixels: false
+deployment:
+  require_checkpoint: true
+  refuse_random_weights: true

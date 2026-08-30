@@ -1,0 +1,61 @@
+{
+  "schema": "helsinki-spatial-split-v1",
+  "coordinate_frame": "backend [east,up,south]; canonical north=-backend_z",
+  "guard_m": 20.0,
+  "assignment_rule": "episode route must lie wholly inside one buffered split",
+  "frame_split_forbidden": true,
+  "excluded_region": {
+    "backend_z_m": [
+      -500.0,
+      -300.0
+    ],
+    "reason": "water/open northern band; excluded rather than using it as held-out city"
+  },
+  "splits": {
+    "test": {
+      "backend_z_interior_m": [
+        -280.0,
+        -120.0
+      ],
+      "canonical_north_interior_m": [
+        120.0,
+        280.0
+      ],
+      "area_m2": 160000.0,
+      "urban_area_m2": 91050.0,
+      "urban_density_mean": 0.32256942987442017,
+      "dense_core_area_m2": 21300.0,
+      "task_endpoint_capacity_cells": 3642
+    },
+    "train": {
+      "backend_z_interior_m": [
+        -80.0,
+        280.0
+      ],
+      "canonical_north_interior_m": [
+        -280.0,
+        80.0
+      ],
+      "area_m2": 360000.0,
+      "urban_area_m2": 308000.0,
+      "urban_density_mean": 0.7516713738441467,
+      "dense_core_area_m2": 16725.0,
+      "task_endpoint_capacity_cells": 12320
+    },
+    "validation": {
+      "backend_z_interior_m": [
+        320.0,
+        480.0
+      ],
+      "canonical_north_interior_m": [
+        -480.0,
+        -320.0
+      ],
+      "area_m2": 160000.0,
+      "urban_area_m2": 67950.0,
+      "urban_density_mean": 0.23859375715255737,
+      "dense_core_area_m2": 9825.0,
+      "task_endpoint_capacity_cells": 2718
+    }
+  }
+}

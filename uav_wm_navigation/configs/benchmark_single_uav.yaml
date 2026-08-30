@@ -1,0 +1,16 @@
+single_uav_only: true
+goal_nwu: [1000.0, 0.0, 2.0]
+scenario: OpenSpace
+difficulty: easy
+reset_samples: 20
+sensor_samples: 200
+policy_steps: 500
+warmup_steps: 10
+env:
+  physics_hz: 50
+  sensor_hz: 10
+  policy_hz: 10
+  success_radius_m: 0.5
+  success_dwell_s: 0.2
+  max_episode_s: 10000.0
+action_normalized: [0.0, 0.0, 0.0, 0.0]

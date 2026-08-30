@@ -1,0 +1,9 @@
+<Application x:Class="UrbanFly.Desktop.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnMainWindowClose">
+  <Application.Resources>
+    <SolidColorBrush x:Key="AppBackground" Color="#061016" />
+    <SolidColorBrush x:Key="AppText" Color="#F0F6F7" />
+  </Application.Resources>
+</Application>

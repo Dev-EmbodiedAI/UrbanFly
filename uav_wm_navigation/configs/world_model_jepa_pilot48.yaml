@@ -1,0 +1,24 @@
+model: jepa
+history: 4
+depth_max_m: 20.0
+state_dim: 13
+trajectory_dim: 9
+latent_dim: 96
+layers: 2
+heads: 4
+max_horizon: 64
+ema_decay: 0.996
+mask_ratio: 0.5
+mask_patch_size: 12
+future_start_index: 1
+future_target_steps: 5
+trajectory_steps: 10
+dropout: 0.15
+mc_dropout_samples: 5
+batch_size: 8
+epochs: 30
+patience: 6
+learning_rate: 0.0003
+weight_decay: 0.0001
+positive_weight: 2.0
+loss_weights: {collision: 2.0, clearance: 1.0, progress: 1.0, failure: 1.0, ranking: 0.5, latent: 0.0, dynamics: 0.5}
