@@ -2593,10 +2593,10 @@ DOCKER BENCHMARK NOT TESTED / DYNAMIC IMITATION BASELINE TRAINABLE BUT NOT TRAIN
   Helsinki 强顺序 adapter、Agent 闭环、Swarm contract/imitation、latent World Model，
   并固定验证正式视频 runner 的默认 command horizon 为 0.5 s。九个相关 Python
   模块/脚本显式 `py_compile` 通过；更名后的 Python stdlib/backend import gate 通过。
-- `LIMITATION` — 本轮代码与小型 QA 已提交到本地 `main`。向现有 GitHub origin
-  push 时，全局 `127.0.0.1:10809` 代理无服务；仅对单次命令禁用代理后直连又被
-  网络层 reset，因此本轮提交尚未到达远端。未修改用户全局 Git/网络配置；网络
-  恢复后执行 `git push origin main` 即可。
+- `PASS` — push 最初受无服务的全局 `127.0.0.1:10809` 代理和短暂直连 reset
+  阻塞；未修改用户全局 Git/网络配置。网络恢复后用仅对单次命令禁用代理的方式
+  成功把平台闭环与低空建筑走廊提交推送到现有 GitHub `origin/main`，远端已包含
+  commit `5410954`。
 - `NEXT` — 先补齐最终回归与源码/文档一致性检查；随后扩展 Swarm 多 seed、
   2–8 UAV teacher 数据，并让同一 learned checkpoint 进入 Swarm 与 Helsinki
   zero-shot/adaptation 对照。Qwen API 只在用户配置 key 后作为高层任务规划器，
