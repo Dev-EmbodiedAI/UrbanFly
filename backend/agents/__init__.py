@@ -17,8 +17,19 @@ from .semantic_fleet import (
     SemanticFleetRuntime,
 )
 from .simulator_bridge import SemanticFleetSimulatorBridge
+from .helsinki_closed_loop import (
+    AgentDirective,
+    AgentStatus,
+    ClosedLoopViolation,
+    HelsinkiAgentWorldModelRuntime,
+    SemanticMissionPlan,
+    WorldModelActionDecision,
+)
 
 __all__ = [
+    "AgentDirective",
+    "AgentStatus",
+    "ClosedLoopViolation",
     "DeterministicSemanticInterpreter",
     "FleetCoordinator",
     "FleetDrone",
@@ -31,4 +42,7 @@ __all__ = [
     "SemanticEventType",
     "SemanticFleetRuntime",
     "SemanticFleetSimulatorBridge",
+    "HelsinkiAgentWorldModelRuntime",
+    "SemanticMissionPlan",
+    "WorldModelActionDecision",
 ]

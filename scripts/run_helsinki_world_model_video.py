@@ -32,11 +32,15 @@ from backend.engine.helsinki_frames import (  # noqa: E402
     backend_world_to_enu,
     enu_to_backend_world,
 )
-from backend.engine.helsinki_navigation import HelsinkiNavigationStack  # noqa: E402
-from uav_wm_navigation.control.route_manager import PolylineRoute  # noqa: E402
-from uav_wm_navigation.simulators.helsinki_websocket_adapter import (  # noqa: E402
-    HelsinkiWebSocketAdapter,
+from backend.agents.helsinki_closed_loop import (  # noqa: E402
+    AgentStatus,
+    HelsinkiAgentWorldModelRuntime,
+    SemanticMissionPlan,
+    WorldModelActionDecision,
 )
+from backend.engine.helsinki_navigation import HelsinkiNavigationStack  # noqa: E402
+from backend.digital_twin import HelsinkiDigitalTwinAdapter  # noqa: E402
+from uav_wm_navigation.control.route_manager import PolylineRoute  # noqa: E402
 from urbanfly_vln.navigation_world_model import (  # noqa: E402
     load_navigation_world_model_checkpoint,
 )
@@ -64,7 +68,10 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--semantic-mission-plan", type=Path)
     result.add_argument("--output-dir", type=Path, required=True)
     result.add_argument("--max-steps", type=int, default=1400)
-    result.add_argument("--action-duration-s", type=float, default=0.1)
+    # The observation policy and latent world model were trained and validated
+    # against the 0.5 s Helsinki command horizon.  A 0.1 s horizon materially
+    # changes the closed-loop trajectory and can accumulate cross-track error.
+    result.add_argument("--action-duration-s", type=float, default=0.5)
     result.add_argument("--goal-tolerance-m", type=float, default=3.0)
     result.add_argument("--maximum-cross-track-m", type=float, default=15.0)
     result.add_argument("--device", choices=("auto", "cuda", "cpu"), default="auto")
@@ -267,6 +274,11 @@ def main() -> None:
     surfaces = [item for item in before.get("surfaces", []) if float(item.get("age_s", 99)) < 5]
     if len(surfaces) != 1 or not bool(surfaces[0].get("scene_ready")):
         raise RuntimeError("exactly one fresh, ready real sensor surface is required")
+    semantic_report = None
+    semantic_mission = None
+    if args.semantic_mission_plan:
+        semantic_report = json.loads(args.semantic_mission_plan.read_text(encoding="utf-8"))
+        semantic_mission = SemanticMissionPlan.from_report(semantic_report)
     custom_requested = args.custom_start_backend is not None or args.custom_goal_backend is not None
     if custom_requested:
         if args.custom_start_backend is None or args.custom_goal_backend is None:
@@ -274,9 +286,24 @@ def main() -> None:
         stack = HelsinkiNavigationStack.load(args.scene, enable_triangle_geometry=True)
         start_backend = np.asarray(args.custom_start_backend, dtype=np.float64)
         goal_backend = np.asarray(args.custom_goal_backend, dtype=np.float64)
+        explicit_via = [np.asarray(point, dtype=np.float64) for point in args.via_backend]
+        if semantic_mission is not None:
+            semantic_via = [
+                np.asarray(point, dtype=np.float64)
+                for point in semantic_mission.ordered_waypoints_backend
+            ]
+            if explicit_via and (
+                len(explicit_via) != len(semantic_via)
+                or any(not np.allclose(left, right, atol=1e-6) for left, right in zip(explicit_via, semantic_via))
+            ):
+                raise ValueError("explicit via points do not match the gated semantic mission plan")
+            via_points = semantic_via
+        else:
+            via_points = explicit_via
+            semantic_mission = SemanticMissionPlan.deterministic([*via_points, goal_backend])
         mission_points = [
             start_backend,
-            *(np.asarray(point, dtype=np.float64) for point in args.via_backend),
+            *via_points,
             goal_backend,
         ]
         segments = []
@@ -298,6 +325,7 @@ def main() -> None:
         route_enu = backend_world_to_enu(route_backend)
         start_enu = backend_world_to_enu(start_backend)
         goal_enu = backend_world_to_enu(goal_backend)
+        mission_waypoints_enu = [backend_world_to_enu(point) for point in [*via_points, goal_backend]]
         direction = route_enu[1] - route_enu[0]
         contract = {
             "route": route_enu,
@@ -324,11 +352,12 @@ def main() -> None:
                 for segment in segments
             ],
         }
-        if args.semantic_mission_plan:
-            planning_report["semantic_mission_plan"] = json.loads(
-                args.semantic_mission_plan.read_text(encoding="utf-8")
-            )
+        if semantic_report is not None:
+            planning_report["semantic_mission_plan"] = semantic_report
+            planning_report["semantic_waypoints_consumed_by_route"] = True
     else:
+        if semantic_mission is not None:
+            raise ValueError("semantic mission plan requires a custom start and goal")
         if args.qa is None:
             raise ValueError("--qa is required when a canonical episode is selected")
         records = load_qa_episode_records(args.qa)
@@ -341,6 +370,9 @@ def main() -> None:
         task_type = record.task_type
         training_membership = "held-out episode 080-099; episode 097 was not used for policy/world-model training"
         planning_report = None
+        goal_backend = enu_to_backend_world(contract["goal"])
+        semantic_mission = SemanticMissionPlan.deterministic([goal_backend])
+        mission_waypoints_enu = [np.asarray(contract["goal"], dtype=np.float64)]
     route = PolylineRoute(
         contract["route"], normal_lookahead_m=20.0, turn_lookahead_m=20.0,
         lookahead_speed_gain_s=0.0, maximum_lookahead_m=20.0,
@@ -351,6 +383,12 @@ def main() -> None:
     world_model, world_metadata = load_navigation_world_model_checkpoint(args.world_model, device=device)
     if world_metadata.get("status") != "OFFLINE_PASS":
         raise RuntimeError("world model has not passed offline validation")
+    agent_runtime = HelsinkiAgentWorldModelRuntime(
+        semantic_mission,
+        mission_waypoints_enu,
+        semantic_waypoint_tolerance_m=25.0,
+        final_goal_tolerance_m=args.goal_tolerance_m,
+    )
     rgb_history = deque(maxlen=policy.config.history_frames)
     depth_history = deque(maxlen=policy.config.history_frames)
     valid_history = deque(maxlen=policy.config.history_frames)
@@ -369,8 +407,15 @@ def main() -> None:
         "policy": str(args.policy.resolve()),
         "world_model": str(args.world_model.resolve()),
         "world_model_control_authority": "15-candidate local action reranker only",
+        "agent_control_authority": "semantic mission sequencing and fail-closed action authorization",
+        "semantic_mission_consumed": semantic_report is not None,
         "backend_safety_shield": True,
-        "global_route_source": "frozen planner route stored in canonical Dataset v1",
+        "global_route_source": (
+            "frozen Helsinki global planner; semantic mission planned segment by segment"
+            if custom_requested
+            else "frozen planner route stored in canonical Dataset v1"
+        ),
+        "action_duration_s": float(args.action_duration_s),
         "steps": 0,
         "selection_changed_steps": 0,
         "world_model_rerank_steps": 0,
@@ -381,7 +426,7 @@ def main() -> None:
         "recording_layout": args.recording_layout,
         "requested_video_speed": args.video_speed,
     }
-    adapter = HelsinkiWebSocketAdapter({
+    adapter = HelsinkiDigitalTwinAdapter({
         "websocket_url": "ws://127.0.0.1:8765/ws",
         "urbanfly_scenario": "single_uav_world_model",
         "vehicle_name": "WM-UAV-01",
@@ -399,12 +444,20 @@ def main() -> None:
     source_video = None
     source_manifest = None
     try:
-        adapter.connect(); adapter.reset()
-        adapter.configure_scenario(task_type, "world_model_video", 20260830 + (args.episode or 0))
-        adapter.set_initial_pose(contract["start"]); adapter.set_goal(contract["goal"]); adapter.takeoff()
-        frame = adapter.get_depth(); state = adapter.get_kinematics()
-        previous_timestamp = float(frame.timestamp)
+        initial = adapter.connect_and_reset(
+            task_type=task_type,
+            split="world_model_video",
+            seed=20260830 + (args.episode or 0),
+            start_enu_m=contract["start"],
+            goal_enu_m=contract["goal"],
+        )
+        frame = initial.frame
+        state = initial.kinematics
         rgb_history.append(frame.rgb); depth_history.append(frame.depth_m); valid_history.append(frame.valid_mask)
+        agent_runtime.begin(
+            observation_timestamp_s=float(frame.timestamp),
+            position_enu=state.position,
+        )
         adapter.start_synchronized_recording(
             output_dir,
             fps=30.0,
@@ -433,6 +486,16 @@ def main() -> None:
             selected_action, terminal_blend = terminal_capture_action(
                 selected_action, local_goal_body, route_state.remaining_m
             )
+            agent_runtime.authorize_world_model(
+                WorldModelActionDecision.create(
+                    step=step,
+                    selected_index=int(decision["selected_index"]),
+                    candidate_count=len(decision["candidates"]),
+                    predicted_risk=float(decision["selected_risk"]),
+                    uncertainty=float(decision["selected_uncertainty"]),
+                    action_body_flu=selected_action,
+                )
+            )
             visualization = {
                 "decision_sequence": step,
                 "candidate_count": 15,
@@ -450,19 +513,29 @@ def main() -> None:
             }
             adapter.publish_policy_visualization(visualization)
             command_world = Rotation.from_quat(state.orientation_xyzw).apply(selected_action[:3])
-            factual = adapter.execute_velocity_command(
+            execution = adapter.step_velocity(
                 command_world,
                 float(selected_action[3]),
                 args.action_duration_s,
                 inference_latency_ms=total_latency_ms,
                 predicted_risk=decision["selected_risk"],
             )
-            frame = adapter.get_depth(); state = adapter.get_kinematics(); collision = adapter.get_collision_info()
-            dt = float(frame.timestamp) - previous_timestamp
-            if dt <= 0: raise RuntimeError(f"timestamp regression at step {step}: {dt}")
-            if bool(factual["stale_action"]): raise RuntimeError(f"stale_action at step {step}")
-            if bool(collision["has_collided"]): raise RuntimeError(f"collision at step {step}")
+            factual = execution.factual_action
+            frame = execution.observation.frame
+            state = execution.observation.kinematics
+            collision = execution.collision
             goal_distance = float(np.linalg.norm(state.position - contract["goal"]))
+            agent_directive = agent_runtime.accept_execution_feedback(
+                step=step,
+                feedback_timestamp_s=float(frame.timestamp),
+                position_enu=state.position,
+                executed_action_body_flu=np.asarray(
+                    factual["action_executed_body_flu"], dtype=np.float64
+                ),
+                stale_action=bool(factual["stale_action"]),
+                collision=bool(collision["has_collided"]),
+                safety_intervened=bool(factual["safety_intervened"]),
+            )
             goal_distances.append(goal_distance)
             cross_track_errors.append(float(route_state.cross_track_error_m))
             inference_latencies_ms.append(total_latency_ms)
@@ -485,11 +558,12 @@ def main() -> None:
                     "terminal_capture_blend": float(terminal_blend),
                 })
             if route_state.cross_track_error_m > args.maximum_cross_track_m:
-                raise RuntimeError(f"cross-track gate exceeded: {route_state.cross_track_error_m:.3f} m")
+                reason = f"cross-track gate exceeded: {route_state.cross_track_error_m:.3f} m"
+                agent_runtime.abort(reason)
+                raise RuntimeError(reason)
             previous_action = selected_action.astype(np.float32)
-            previous_timestamp = float(frame.timestamp)
             rgb_history.append(frame.rgb); depth_history.append(frame.depth_m); valid_history.append(frame.valid_mask)
-            if goal_distance <= args.goal_tolerance_m:
+            if agent_directive.status is AgentStatus.COMPLETE:
                 result["success"] = True
                 break
         else:
@@ -497,8 +571,11 @@ def main() -> None:
             raise RuntimeError("maximum steps reached")
         result["collision"] = False
         result["stale_action_count"] = 0
+        result["agent_closed_loop"] = agent_runtime.snapshot()
         result["safety_interventions"] = safety_interventions
     except BaseException as error:
+        if agent_runtime.status is AgentStatus.RUNNING:
+            agent_runtime.abort(repr(error))
         result["status"] = "FAIL"
         result["success"] = False
         result["error"] = repr(error)
@@ -532,6 +609,7 @@ def main() -> None:
         result["maximum_cross_track_error_m"] = max(cross_track_errors, default=0.0)
         result["safety_interventions"] = safety_interventions
         result["stale_action_count"] = 0
+        result["agent_closed_loop"] = agent_runtime.snapshot()
         if inference_latencies_ms:
             latency = np.asarray(inference_latencies_ms, dtype=np.float64)
             result["inference_latency_ms"] = {
@@ -539,7 +617,8 @@ def main() -> None:
                 "p95": float(np.percentile(latency, 95)),
                 "maximum": float(np.max(latency)),
             }
-        if result.get("success") and result.get("video", {}).get("status") == "PASS" and result["world_model_rerank_steps"] == result["steps"] and result["latent_visualization_steps"] == result["steps"] and result["selection_changed_steps"] > 0 and not result.get("cleanup_error"):
+        loop_qa = result["agent_closed_loop"]
+        if result.get("success") and result.get("video", {}).get("status") == "PASS" and result["world_model_rerank_steps"] == result["steps"] and result["latent_visualization_steps"] == result["steps"] and result["selection_changed_steps"] > 0 and loop_qa["status"] == "COMPLETE" and loop_qa["causal_chain_complete"] and loop_qa["fresh_feedbacks"] == result["steps"] and not result.get("cleanup_error"):
             result["status"] = "PASS"
         elif result.get("status") == "RUNNING":
             result["status"] = "FAIL"

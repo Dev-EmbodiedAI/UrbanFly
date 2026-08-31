@@ -1,0 +1,145 @@
+{
+  "schema": "urbanfly-cross-environment-digital-twin-qa-v1",
+  "status": "PASS",
+  "scope": "Swarm exact-goal digital-twin navigation; one fixed seed per environment",
+  "environments": [
+    "swarm:city",
+    "swarm:open",
+    "swarm:mountain",
+    "swarm:village",
+    "swarm:forest"
+  ],
+  "seed": 20260831,
+  "drones_per_environment": 2,
+  "control_contract": "cf_swarm_autopilot submission_zip.v1 [N,128,128,1]+[N,190]->[N,5]",
+  "episodes": 5,
+  "total_drones": 10,
+  "successful_drones": 10,
+  "collisions": 0,
+  "total_steps": 12231,
+  "world_model_decisions": 12231,
+  "all_causal_chains_complete": true,
+  "reports_newer_than_policy_sources": true,
+  "policy_source_sha256": {
+    "D:\\AI\\UrbanFly\\backend\\digital_twin\\goal_world_model.py": "9308c5fbb281265e97433e096005d3f081c4e8b38d0bf408f68caa5f032a71a2",
+    "D:\\AI\\UrbanFly\\backend\\digital_twin\\swarm_adapter.py": "7a97a3f6ebb6190480a0914317885ea7f97281c9038ec66e7602a218bef557f4"
+  },
+  "upstream_commit": "112a0592dab131f644cd6afdf7c6a9acd9de0a37",
+  "per_environment": {
+    "swarm:city": {
+      "report": "D:\\AI\\UrbanFly\\outputs\\cross_environment_digital_twin_v1\\city_seed20260831_2uav_final.json",
+      "report_sha256": "16e23a5ed67c5c1711e1b52da91af2dadd09f3553b7827640784ae75fd0fe05d",
+      "steps": 1727,
+      "successes": 2,
+      "drones": 2,
+      "collisions": 0,
+      "native_score": 0.8514227555381694,
+      "minimum_predicted_clearance_m": 2.795443058013916,
+      "minimum_predicted_separation_m": 40.6710090637207,
+      "gates": {
+        "status_pass": true,
+        "all_drones_success": true,
+        "zero_collision": true,
+        "no_failure_reason": true,
+        "causal_counts_pass": true,
+        "exact_goal_mode_not_benchmark": true,
+        "clearance_finite_nonnegative": true,
+        "separation_finite_positive": true,
+        "native_score_valid": true
+      }
+    },
+    "swarm:open": {
+      "report": "D:\\AI\\UrbanFly\\outputs\\cross_environment_digital_twin_v1\\open_seed20260831_2uav_final.json",
+      "report_sha256": "91645670a1868e68cedbe565e28bb3bf0112e8e1d8bda4f1ea971dc84263d0cf",
+      "steps": 1838,
+      "successes": 2,
+      "drones": 2,
+      "collisions": 0,
+      "native_score": 0.7529762949363027,
+      "minimum_predicted_clearance_m": 2.7730164527893066,
+      "minimum_predicted_separation_m": 18.025270462036133,
+      "gates": {
+        "status_pass": true,
+        "all_drones_success": true,
+        "zero_collision": true,
+        "no_failure_reason": true,
+        "causal_counts_pass": true,
+        "exact_goal_mode_not_benchmark": true,
+        "clearance_finite_nonnegative": true,
+        "separation_finite_positive": true,
+        "native_score_valid": true
+      }
+    },
+    "swarm:mountain": {
+      "report": "D:\\AI\\UrbanFly\\outputs\\cross_environment_digital_twin_v1\\mountain_seed20260831_2uav_final.json",
+      "report_sha256": "10090a7a8336ccbc2315f10560973ab0842391c23d8535b81f6a45ff06a99a6c",
+      "steps": 2935,
+      "successes": 2,
+      "drones": 2,
+      "collisions": 0,
+      "native_score": 0.5726656453084049,
+      "minimum_predicted_clearance_m": 2.530961513519287,
+      "minimum_predicted_separation_m": 84.3250503540039,
+      "gates": {
+        "status_pass": true,
+        "all_drones_success": true,
+        "zero_collision": true,
+        "no_failure_reason": true,
+        "causal_counts_pass": true,
+        "exact_goal_mode_not_benchmark": true,
+        "clearance_finite_nonnegative": true,
+        "separation_finite_positive": true,
+        "native_score_valid": true
+      }
+    },
+    "swarm:village": {
+      "report": "D:\\AI\\UrbanFly\\outputs\\cross_environment_digital_twin_v1\\village_seed20260831_2uav_final.json",
+      "report_sha256": "38deebcd3fc14a6132cf6506874b6cfaa4d33a63b81c73291992ceca06880cb1",
+      "steps": 2988,
+      "successes": 2,
+      "drones": 2,
+      "collisions": 0,
+      "native_score": 0.6027772650439738,
+      "minimum_predicted_clearance_m": 1.8969138860702515,
+      "minimum_predicted_separation_m": 46.80616760253906,
+      "gates": {
+        "status_pass": true,
+        "all_drones_success": true,
+        "zero_collision": true,
+        "no_failure_reason": true,
+        "causal_counts_pass": true,
+        "exact_goal_mode_not_benchmark": true,
+        "clearance_finite_nonnegative": true,
+        "separation_finite_positive": true,
+        "native_score_valid": true
+      }
+    },
+    "swarm:forest": {
+      "report": "D:\\AI\\UrbanFly\\outputs\\cross_environment_digital_twin_v1\\forest_seed20260831_2uav_final.json",
+      "report_sha256": "846f9b56cf0623068eaa37627c19d74ac718e335af6c16085a5f3b998251a65d",
+      "steps": 2743,
+      "successes": 2,
+      "drones": 2,
+      "collisions": 0,
+      "native_score": 0.6185107522361739,
+      "minimum_predicted_clearance_m": 1.8994942903518677,
+      "minimum_predicted_separation_m": 46.342411041259766,
+      "gates": {
+        "status_pass": true,
+        "all_drones_success": true,
+        "zero_collision": true,
+        "no_failure_reason": true,
+        "causal_counts_pass": true,
+        "exact_goal_mode_not_benchmark": true,
+        "clearance_finite_nonnegative": true,
+        "separation_finite_positive": true,
+        "native_score_valid": true
+      }
+    }
+  },
+  "limitations": [
+    "exact goals are exposed to the high-level Agent, so these runs are not formal Swarm benchmark entries",
+    "the Swarm World Model is an analytic one-step predictive baseline, not the learned Helsinki latent checkpoint",
+    "one fixed seed and two UAVs per environment do not establish statistical generalization"
+  ]
+}

@@ -2445,3 +2445,163 @@ FOUR-PANEL 3X VIDEO PASS / QWEN SEMANTIC ORDER LOCAL-ONLY AND GATED`**.
 - `PLANNED` — GitHub 远端仓库、v1.0.0 Release 和 Ubuntu 原生 Linux x64 包尚未完成，因此本节当前不能声称 GitHub/Windows/Linux 全部发布。
 
 Current verdict: **`WINDOWS HELSINKI INSTALLER LOCAL QA PASS / GITHUB AND LINUX RELEASE PENDING`**.
+
+## 36. GitHub Release 完成与 UrbanFly × Swarm 跨环境实验支线（2026-08-30）
+
+### 36.1 GitHub 与跨平台发布真实结果
+
+- `PASS` — Git 仓库已建立并推送到
+  `https://github.com/Dev-EmbodiedAI/UrbanFly`；`v1.0.0` Release 已发布：
+  `https://github.com/Dev-EmbodiedAI/UrbanFly/releases/tag/v1.0.0`。
+- `PASS` — Windows installer、portable、Helsinki 城市资产、100-episode
+  Dataset v1、1 km 演示 MP4 和各 manifest 均已作为 Release asset 上传；GitHub
+  digest 与本地 SHA256 一致。
+- `PASS` — Linux workflow run `33310660418` 在 Ubuntu 24.04 完成前端构建、
+  PyInstaller 后端冻结、Helsinki 资产组装、`/api/health` 与首页 HTTP 回读并上传
+  `UrbanFly-Linux-x64-1.0.0.tar.gz`。文件为 **287,411,127 bytes**，SHA256
+  `6f42de3f4abbde92dd58cfe66316a758572ad7fe0a4eeb9774ef63b4069302bb`。
+- Linux 首次失败来自 Windows `Compress-Archive` 的反斜杠路径；第二次失败来自
+  反斜杠结尾目录项。workflow 现使用带路径穿越检查的 Python zipfile 归一化，
+  没有跳过资产或健康检查。
+
+### 36.2 Swarm 上游 contract 与原生链路
+
+- 用户批准的跨环境实验支线不是仓库拼接，而是同一 policy 在 Swarm 程序化
+  环境与 UrbanFly Helsinki 的跨域比较；它不替代 UrbanFly 的 Agent +
+  Action-Conditioned World Model 主线。上游固定为
+  `swarm-subnet/swarm@112a0592dab131f644cd6afdf7c6a9acd9de0a37`。
+- `PASS` — 上游 `tests/test_swarm_autopilot_family.py` 为 **14/14 PASS**，实际
+  创建并步进了多机 PyBullet 环境。
+- `PASS` — `scripts/audit_swarm_native_contract.py` 在 City/Open/Mountain/
+  Village/Forest × 2–8 UAV 的 **35/35** 组合中验证 depth `[N,128,128,1]`、
+  state `[N,190]`、action `[N,5]`、shared clue、邻机槽、评分范围与 per-drone
+  算术平均。
+- `PASS` — 强制两机同位姿接触产生 2 个 PyBullet contacts，双方均为
+  `OBSTACLE_COLLISION`，per-drone score **0.01/0.01**，final score **0.01**；
+  collision → failure reason → score 链路通过。
+- `LIMITATION` — 本地 Windows 只能获取 `swarm-bullet3==2.0.0.1`，上游锁定
+  `2.0.0.3` 没有 Windows 包；Forest 训练期间出现旧版 collision-shape warning。
+  本地报告是 native contract PASS，不是 Docker/Cap'n Proto 官方 Benchmark PASS。
+
+### 36.3 环境无关 policy adapter
+
+- `PASS` — `backend/integrations/swarm_policy.py` 建立不依赖 Swarm 源码的统一
+  contract encoder，显式处理 UrbanFly `[east,up,north]` ↔ policy ENU
+  `[east,north,up]`、公制深度归一化、25 步 action history、shared clue、7 个
+  最近邻机槽和动作反变换。
+- `PASS` — contract 聚焦回归 **4/4**，覆盖 shape、数值范围、坐标/yaw、邻机
+  排序、padding 和动作边界；没有修改任何 Helsinki frozen component。
+
+### 36.4 Baseline 路线修正：训练不等于 RL
+
+- `PASS (trainability only)` — 上游共享参数 PPO 实际训练到 **51,200
+  timesteps**（请求 50k，SB3 rollout 向上取整），CUDA backward、loss 更新、
+  checkpoint 和 submission 打包均成功。
+- `FAIL (navigation quality)` — 已完成的 City/Open/Mountain 完整 rollout 均
+  失败或发生碰撞，score 为 0.01。用户质疑无需强制 RL 后，剩余矩阵被停止；
+  不存在完整 35-episode PPO Benchmark 报告，也不得写成已完成。
+- `PASS (cleanup)` — 失败 PPO checkpoint、submission 和生成目录已删除，未进入
+  `models/`、Git 或 Release。
+- `PASS (trainable non-RL baseline)` —
+  `backend/integrations/swarm_imitation.py` 实现共享 depth/state 编码、动态 2–8
+  机 self-attention、动作头、collision auxiliary head、masked imitation loss 和
+  checkpoint schema。forward/bounds/backward/mask/checkpoint **4/4 PASS**；与
+  contract 合计 **8/8 PASS**。
+- `NOT TRAINED` — imitation 网络目前没有主 checkpoint 或成功率。Swarm 实验
+  支线的 baseline 训练路径变为 classical privileged teacher → BC → DAgger；
+  RL 仅是可选 residual，不能成为基本可飞性的前提。该 baseline 只用于统一
+  policy 的预训练、benchmark 与消融，不替代 UrbanFly Agent 的任务推理、Qwen
+  API 能力或 World Model 的未来隐状态/风险预测和在线轨迹选择。
+
+详细方案：`docs/SWARM_CROSS_DOMAIN.md`。
+
+Current verdict: **`SWARM NATIVE CONTRACT 35/35 PASS / COLLISION-SCORE CHAIN PASS /
+DOCKER BENCHMARK NOT TESTED / DYNAMIC IMITATION BASELINE TRAINABLE BUT NOT TRAINED`**.
+
+## 37. 跨环境数字孪生闭环与平台化 Helsinki 1 km 复核（2026-08-31）
+
+### 37.1 Swarm 五环境同生命周期闭环
+
+- `PASS` — 新增 `backend/digital_twin/goal_world_model.py`、
+  `swarm_adapter.py` 与 `qa.py`，以及正式运行/合并审计脚本。City、Open、
+  Mountain、Village、Forest 在固定 seed `20260831`、每类 2 UAV 下均使用
+  “任务分配 → policy → 一步预测式 World Model 重排 → PyBullet 原生执行 →
+  fresh depth/state feedback”同一因果生命周期。
+- `PASS` — 五类合计 **10/10 UAV 成功、0 collision、12,231 控制步**。各环境
+  控制步为 1,727 / 1,838 / 2,935 / 2,988 / 2,743；原生分数为
+  0.8514 / 0.7530 / 0.5727 / 0.6028 / 0.6185。独立 QA 位于
+  `outputs/cross_environment_digital_twin_v1/cross_environment_qa.json`，上游固定为
+  `swarm-subnet/swarm@112a0592dab131f644cd6afdf7c6a9acd9de0a37`。
+- `PASS (cleanup)` — 44 个开发/失败 JSON 已不可恢复删除，正式目录只保留五个
+  final 环境报告和一个合并 QA。
+- `LIMITATION` — 这是向策略暴露 exact goal 的数字孪生模式，所有报告均明确
+  `benchmark_eligible=false`，不是官方隐藏目标 Swarm Benchmark。Swarm 端目前是
+  解析式一步预测器，不是 Helsinki 的 learned latent checkpoint；单 seed、2 UAV
+  不能证明统计泛化。
+
+### 37.2 统一 Helsinki 平台适配与 P0 修复
+
+- `PASS` — `backend/digital_twin/helsinki_adapter.py` 将真实隐藏浏览器运行时封装为
+  `connect/reset → RGB-D+6DoF observation → velocity action → factual executed action /
+  collision / fresh observation` 强顺序 session，并加入 shape、finite、timestamp、
+  stale/collision fail-closed 检查。冻结的 Global Planner、Privileged Expert、三角
+  几何、controller、sampler 和 Local Goal 核心均未修改。
+- `P0 FIXED` — 初始包名 `backend/platform` 会在旧 server 把 `backend` 插入
+  `sys.path` 后遮蔽 Python 标准库 `platform`，导致 aiohttp/numpy/scipy 启动失败。
+  包已整体更名为 `backend/digital_twin`，标准库 `platform.machine` 与 backend import
+  gate 均恢复通过。
+- `P1 FIXED` — `scripts/launch_desktop.ps1` 原来寻找不存在的
+  `UrbanFly.exe`；开发 publish 的真实入口是 `UrbanFly.Desktop.exe`。启动器现使用
+  正确入口并在构建未产生它时明确失败。
+
+### 37.3 新的真实 Agent → World Model → Helsinki → feedback 复核
+
+- `PASS` — 使用 100 条零-stale 主数据 QA、
+  `models/helsinki_observation_policy_v1.pt`、
+  `models/helsinki_latent_world_model_v1.pt` 和已 gated 的语义 waypoint plan，按原
+  1,013.678521 m 四段路线完成新的隐藏桌面闭环。运行时始终只有一个隐藏 ready
+  surface 和一个 lockstep policy，无鼠标操作、无第二传感器表面。
+- `PASS` — 正式结果位于
+  `outputs/digital_twin_platform_v1/helsinki_1km_final_v2`：**1,114 步成功**，
+  `AgentStatus=COMPLETE`，4/4 mission waypoints reached，因果链完整，fresh
+  feedback **1,114/1,114**；learned latent World Model 重排 **1,114/1,114**，
+  并在 **633** 步改变 base policy 选择。
+- `PASS` — 0 collision、0 stale action、0 backend safety intervention；最终最小
+  goal distance **2.6344 m**，最大 cross-track **11.8748 m**，通过 3 m/15 m gate。
+  四段 frozen planner 路线均 valid，最小 heightmap clearance **7.2773 m**，最小
+  triangle distance **7.2827 m**，triangle collision=false。
+- `PASS` — 连续四分屏 3× MP4 为 1920×1080、30 FPS、3,667 frames、
+  **122.233 s**、48,517,036 bytes，SHA256
+  `975c4022f848b888da186210b864de9225f13f43f259fc0b6bfa4cdb0d3e6826`。
+  独立哈希回读一致；60 s 抽帧人工确认第三视角/真实轨迹、RGB、Depth、192-D
+  learned latent/候选风险四个 panel 均为有效非黑内容。
+- `FAIL (preserved fact, artifact removed from project)` — 首次平台复核运行误用
+  0.1 s command horizon，在 step 918 触发 cross-track 15.035 m > 15 m gate，脚本
+  正确 fail-closed，未伪装为成功。对照旧 PASS 轨迹确定已验证 horizon 实为 0.5 s；
+  保持所有 gate 不变重跑后通过。脚本默认值已固化为 0.5 s，并在 QA 中记录
+  `action_duration_s`。失败目录和更早 backend-disconnect 失败目录已移出项目到可
+  恢复临时清理目录 `C:/Users/caste/AppData/Local/Temp/UrbanFly_cleanup_20260831`；
+  本轮 17 个 runtime 开发日志也移到同一目录。正式输出只保留 PASS 成品。
+- `LIMITATION` — 当前环境未配置 `URBANFLY_QWEN_API_KEY`、
+  `DASHSCOPE_API_KEY` 或 Qwen base URL，因此本次继续消费历史 gated local-Qwen
+  语义顺序，`api_called=false`。正式发布代码默认仍是 OpenAI-compatible Qwen API，
+  不携带或提交 Qwen 原始权重。单条 1 km PASS 仍不等于多 seed/任意端点统计泛化。
+
+### 37.4 验证与下一 Gate
+
+- `PASS` — 最终聚焦回归为 **23/23 PASS**，覆盖五环境 digital-twin policy/QA、
+  Helsinki 强顺序 adapter、Agent 闭环、Swarm contract/imitation、latent World Model，
+  并固定验证正式视频 runner 的默认 command horizon 为 0.5 s。九个相关 Python
+  模块/脚本显式 `py_compile` 通过；更名后的 Python stdlib/backend import gate 通过。
+- `LIMITATION` — 本轮代码与小型 QA 已提交到本地 `main`。向现有 GitHub origin
+  push 时，全局 `127.0.0.1:10809` 代理无服务；仅对单次命令禁用代理后直连又被
+  网络层 reset，因此本轮提交尚未到达远端。未修改用户全局 Git/网络配置；网络
+  恢复后执行 `git push origin main` 即可。
+- `NEXT` — 先补齐最终回归与源码/文档一致性检查；随后扩展 Swarm 多 seed、
+  2–8 UAV teacher 数据，并让同一 learned checkpoint 进入 Swarm 与 Helsinki
+  zero-shot/adaptation 对照。Qwen API 只在用户配置 key 后作为高层任务规划器，
+  不进入低层安全控制。
+
+Current verdict: **`AGENT → LEARNED WORLD MODEL → HELSINKI EXECUTION → FRESH
+FEEDBACK CLOSED LOOP PASS / SWARM FIVE-ENV EXACT-GOAL DIGITAL TWIN PASS /
+FORMAL CROSS-DOMAIN GENERALIZATION NOT YET QUALIFIED`**.

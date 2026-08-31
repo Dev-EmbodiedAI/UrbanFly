@@ -18,6 +18,7 @@ UrbanFly 是一套面向城市低空无人机研究的可运行数字孪生系�
 - Qwen API 语义观察器与多无人机任务协调；发布包不包含 Qwen 权重。
 - HDF5 数据集写入、独立回读、时间戳、stale action、reset 和 `.partial` 审计。
 - Windows 一键安装版，以及由 GitHub Actions 原生构建的 Linux x64 开发包。
+- Swarm `cf_swarm_autopilot` 跨环境 contract：五类程序化环境、2–8 UAV 与 Helsinki 使用同一 policy 输入输出边界。
 
 ## 下载与安装
 
@@ -161,6 +162,14 @@ python scripts/render_world_model_long_range_demo.py --help
 
 数据集检查与读回工具位于 `scripts/`，正式结果以发布包内的 manifest 和 QA JSON 为准，不以截图或日志中的目标值代替实测值。
 
+## UrbanFly × Swarm 跨环境实验支线
+
+UrbanFly 的系统主线始终是 **Agent 能力 + Action-Conditioned World Model + Helsinki 数字孪生闭环导航**：Agent 负责任务理解、协同、工具/API 调用和动态重规划，World Model 负责预测候选动作的未来隐状态、进展与风险，并参与在线轨迹选择。Swarm 只是跨环境实验支线，用同一个多无人机 policy 分别在 City、Open、Mountain、Village、Forest 和 Helsinki 中测试 Procedural → Realistic Digital Twin 泛化。
+
+已完成 35/35 个“五类环境 × 2–8 UAV”原生 contract 组合、shared clue、评分和强制机间碰撞链审计。进一步使用同一套“目标分配 → policy → 预测式 World Model 重排 → 原生环境执行 → 新观测反馈”生命周期，在固定 held-out seed、每类 2 架无人机的 City/Open/Mountain/Village/Forest 中取得 **10/10 成功、0 碰撞、12,231 次闭环执行**。该结果属于显式目标可见的数字孪生模式，不冒充隐藏目标的官方 Swarm Benchmark。统一 adapter 与动态多机 imitation 网络已有聚焦测试通过；classical teacher → BC → DAgger 仅用于统一 policy 的预训练、对照与数据启动，强化学习只是可选 residual，二者都不替代 UrbanFly 的 Agent + World Model 主线。
+
+详细状态、诚实限制与后续实验 Gate 见 [UrbanFly × Swarm 跨环境方案](docs/SWARM_CROSS_DOMAIN.md)。
+
 ## 已验证结果
 
 当前主数据集由恰好 100 个唯一且连续的真实 Helsinki episode 组成：
@@ -170,6 +179,7 @@ python scripts/render_world_model_long_range_demo.py --help
 - 自动 reset、RGB、Depth、State、Next State、commanded/executed action、Local Goal、yaw、quaternion 与 timestamp 均经过独立审计。
 - HDF5 独立回读通过，损坏文件为 0，`.partial` 为 0。
 - 长程世界模型演示成功到达目标地面，并保留完整飞行质量报告。
+- 最新平台化 Helsinki 1 km 闭环为 1,114 步，World Model 参与 1,114/1,114 次动作重排并改变 633 次选择；4/4 语义途径点完成，0 collision、0 stale action，最终目标距离 2.634 m，四分屏 3× 视频独立回读通过。
 
 精确数值、哈希和输入目录记录在 Release manifest、主数据集 `dataset_qa.json` 及 `docs/PROJECT_STATE.md` 中。
 

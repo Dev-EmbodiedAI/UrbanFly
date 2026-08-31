@@ -1,0 +1,1871 @@
+{
+  "schema": "urbanfly-swarm-native-contract-audit-v1",
+  "family_id": "cf_swarm_autopilot",
+  "upstream_root": "D:\\AI\\UrbanFly\\tmp\\swarm-main",
+  "upstream_commit": "112a0592dab131f644cd6afdf7c6a9acd9de0a37",
+  "runtime": {
+    "python": "3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:17:27) [MSC v.1929 64 bit (AMD64)]",
+    "numpy": "2.2.6",
+    "swarm-bullet3": "2.0.0.1",
+    "swarm-drone-gym": "2.0.0.3",
+    "gymnasium": "0.29.1"
+  },
+  "contract": {
+    "depth_shape": [
+      "N",
+      128,
+      128,
+      1
+    ],
+    "state_shape": [
+      "N",
+      190
+    ],
+    "action_shape": [
+      "N",
+      5
+    ],
+    "drone_count_range": [
+      2,
+      8
+    ]
+  },
+  "matrix": {
+    "environments": [
+      "city",
+      "open",
+      "mountain",
+      "village",
+      "forest"
+    ],
+    "drone_counts": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "cases": 35,
+    "passed": 35,
+    "failed": 0,
+    "failed_rows": []
+  },
+  "collision_probe": {
+    "environment": "open",
+    "n_drones": 2,
+    "seed": 20269830,
+    "method": "将第 2 架无人机重置到第 1 架的同一位姿后执行一个原生仿真步",
+    "pybullet_contact_count": 2,
+    "per_drone_collision": [
+      true,
+      true
+    ],
+    "per_drone_failure_reason": [
+      "OBSTACLE_COLLISION",
+      "OBSTACLE_COLLISION"
+    ],
+    "per_drone_final_score": [
+      0.01,
+      0.01
+    ],
+    "final_score": 0.01,
+    "collision_detected": true,
+    "collision_reached_score": true,
+    "pass": true
+  },
+  "rows": [
+    {
+      "environment": "city",
+      "challenge_type": 1,
+      "n_drones": 2,
+      "seed": 20260932,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        2,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        2,
+        190
+      ],
+      "shared_clue_spread_m": 9.5367431640625e-07,
+      "teammate_presence_counts": [
+        1,
+        1
+      ],
+      "per_drone_collision": [
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "city",
+      "challenge_type": 1,
+      "n_drones": 3,
+      "seed": 20260933,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        3,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        3,
+        190
+      ],
+      "shared_clue_spread_m": 0.0,
+      "teammate_presence_counts": [
+        2,
+        2,
+        2
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "city",
+      "challenge_type": 1,
+      "n_drones": 4,
+      "seed": 20260934,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        4,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        4,
+        190
+      ],
+      "shared_clue_spread_m": 1.9073486328125e-06,
+      "teammate_presence_counts": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "city",
+      "challenge_type": 1,
+      "n_drones": 5,
+      "seed": 20260935,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        5,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        5,
+        190
+      ],
+      "shared_clue_spread_m": 5.4158290367922746e-06,
+      "teammate_presence_counts": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "city",
+      "challenge_type": 1,
+      "n_drones": 6,
+      "seed": 20260936,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        6,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        6,
+        190
+      ],
+      "shared_clue_spread_m": 7.62939453125e-06,
+      "teammate_presence_counts": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "city",
+      "challenge_type": 1,
+      "n_drones": 7,
+      "seed": 20260937,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        7,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        7,
+        190
+      ],
+      "shared_clue_spread_m": 4.2649612623790745e-06,
+      "teammate_presence_counts": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "city",
+      "challenge_type": 1,
+      "n_drones": 8,
+      "seed": 20260938,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        8,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        8,
+        190
+      ],
+      "shared_clue_spread_m": 3.84438408218557e-06,
+      "teammate_presence_counts": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "open",
+      "challenge_type": 2,
+      "n_drones": 2,
+      "seed": 20261032,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        2,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        2,
+        190
+      ],
+      "shared_clue_spread_m": 1.9073486328125e-06,
+      "teammate_presence_counts": [
+        1,
+        1
+      ],
+      "per_drone_collision": [
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "open",
+      "challenge_type": 2,
+      "n_drones": 3,
+      "seed": 20261033,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        3,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        3,
+        190
+      ],
+      "shared_clue_spread_m": 2.6973982585332124e-06,
+      "teammate_presence_counts": [
+        2,
+        2,
+        2
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "open",
+      "challenge_type": 2,
+      "n_drones": 4,
+      "seed": 20261034,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        4,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        4,
+        190
+      ],
+      "shared_clue_spread_m": 4.2649612623790745e-06,
+      "teammate_presence_counts": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "open",
+      "challenge_type": 2,
+      "n_drones": 5,
+      "seed": 20261035,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        5,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        5,
+        190
+      ],
+      "shared_clue_spread_m": 2.6973982585332124e-06,
+      "teammate_presence_counts": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "open",
+      "challenge_type": 2,
+      "n_drones": 6,
+      "seed": 20261036,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        6,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        6,
+        190
+      ],
+      "shared_clue_spread_m": 3.84438408218557e-06,
+      "teammate_presence_counts": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "open",
+      "challenge_type": 2,
+      "n_drones": 7,
+      "seed": 20261037,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        7,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        7,
+        190
+      ],
+      "shared_clue_spread_m": 2.7079145183961373e-06,
+      "teammate_presence_counts": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "open",
+      "challenge_type": 2,
+      "n_drones": 8,
+      "seed": 20261038,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        8,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        8,
+        190
+      ],
+      "shared_clue_spread_m": 2.7392209176468896e-06,
+      "teammate_presence_counts": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "mountain",
+      "challenge_type": 3,
+      "n_drones": 2,
+      "seed": 20261132,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        2,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        2,
+        190
+      ],
+      "shared_clue_spread_m": 1.9073486328125e-06,
+      "teammate_presence_counts": [
+        1,
+        1
+      ],
+      "per_drone_collision": [
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "mountain",
+      "challenge_type": 3,
+      "n_drones": 3,
+      "seed": 20261133,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        3,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        3,
+        190
+      ],
+      "shared_clue_spread_m": 8.58306884765625e-06,
+      "teammate_presence_counts": [
+        2,
+        2,
+        2
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "mountain",
+      "challenge_type": 3,
+      "n_drones": 4,
+      "seed": 20261134,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        4,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        4,
+        190
+      ],
+      "shared_clue_spread_m": 4.2649612623790745e-06,
+      "teammate_presence_counts": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "mountain",
+      "challenge_type": 3,
+      "n_drones": 5,
+      "seed": 20261135,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        5,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        5,
+        190
+      ],
+      "shared_clue_spread_m": 7.864199687901419e-06,
+      "teammate_presence_counts": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "mountain",
+      "challenge_type": 3,
+      "n_drones": 6,
+      "seed": 20261136,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        6,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        6,
+        190
+      ],
+      "shared_clue_spread_m": 5.7220458984375e-06,
+      "teammate_presence_counts": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "mountain",
+      "challenge_type": 3,
+      "n_drones": 7,
+      "seed": 20261137,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        7,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        7,
+        190
+      ],
+      "shared_clue_spread_m": 6.031566044839565e-06,
+      "teammate_presence_counts": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "mountain",
+      "challenge_type": 3,
+      "n_drones": 8,
+      "seed": 20261138,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        8,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        8,
+        190
+      ],
+      "shared_clue_spread_m": 5.394796517066425e-06,
+      "teammate_presence_counts": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "village",
+      "challenge_type": 4,
+      "n_drones": 2,
+      "seed": 20261232,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        2,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        2,
+        190
+      ],
+      "shared_clue_spread_m": 7.62939453125e-06,
+      "teammate_presence_counts": [
+        1,
+        1
+      ],
+      "per_drone_collision": [
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "village",
+      "challenge_type": 4,
+      "n_drones": 3,
+      "seed": 20261233,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        3,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        3,
+        190
+      ],
+      "shared_clue_spread_m": 7.68876816437114e-06,
+      "teammate_presence_counts": [
+        2,
+        2,
+        2
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "village",
+      "challenge_type": 4,
+      "n_drones": 4,
+      "seed": 20261234,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        4,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        4,
+        190
+      ],
+      "shared_clue_spread_m": 3.814697265625e-06,
+      "teammate_presence_counts": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "village",
+      "challenge_type": 4,
+      "n_drones": 5,
+      "seed": 20261235,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        5,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        5,
+        190
+      ],
+      "shared_clue_spread_m": 4.271620127838105e-06,
+      "teammate_presence_counts": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "village",
+      "challenge_type": 4,
+      "n_drones": 6,
+      "seed": 20261236,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        6,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        6,
+        190
+      ],
+      "shared_clue_spread_m": 2.1324806311895372e-06,
+      "teammate_presence_counts": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "village",
+      "challenge_type": 4,
+      "n_drones": 7,
+      "seed": 20261237,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        7,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        7,
+        190
+      ],
+      "shared_clue_spread_m": 2.90048728857073e-06,
+      "teammate_presence_counts": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "village",
+      "challenge_type": 4,
+      "n_drones": 8,
+      "seed": 20261238,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        8,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        8,
+        190
+      ],
+      "shared_clue_spread_m": 2.1324806311895372e-06,
+      "teammate_presence_counts": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "forest",
+      "challenge_type": 6,
+      "n_drones": 2,
+      "seed": 20261432,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        2,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        2,
+        190
+      ],
+      "shared_clue_spread_m": 0.0,
+      "teammate_presence_counts": [
+        1,
+        1
+      ],
+      "per_drone_collision": [
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "forest",
+      "challenge_type": 6,
+      "n_drones": 3,
+      "seed": 20261433,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        3,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        3,
+        190
+      ],
+      "shared_clue_spread_m": 2.8709398520732066e-06,
+      "teammate_presence_counts": [
+        2,
+        2,
+        2
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "forest",
+      "challenge_type": 6,
+      "n_drones": 4,
+      "seed": 20261434,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        4,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        4,
+        190
+      ],
+      "shared_clue_spread_m": 4.2649612623790745e-06,
+      "teammate_presence_counts": [
+        3,
+        3,
+        3,
+        3
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "forest",
+      "challenge_type": 6,
+      "n_drones": 5,
+      "seed": 20261435,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        5,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        5,
+        190
+      ],
+      "shared_clue_spread_m": 2.6973982585332124e-06,
+      "teammate_presence_counts": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "forest",
+      "challenge_type": 6,
+      "n_drones": 6,
+      "seed": 20261436,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        6,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        6,
+        190
+      ],
+      "shared_clue_spread_m": 4.291534423828125e-06,
+      "teammate_presence_counts": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "forest",
+      "challenge_type": 6,
+      "n_drones": 7,
+      "seed": 20261437,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        7,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        7,
+        190
+      ],
+      "shared_clue_spread_m": 1.9073486328125e-06,
+      "teammate_presence_counts": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    },
+    {
+      "environment": "forest",
+      "challenge_type": 6,
+      "n_drones": 8,
+      "seed": 20261438,
+      "steps": 3,
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "depth_shape": [
+        8,
+        128,
+        128,
+        1
+      ],
+      "state_shape": [
+        8,
+        190
+      ],
+      "shared_clue_spread_m": 3.932099843950709e-06,
+      "teammate_presence_counts": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "per_drone_collision": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "final_score": 0.01,
+      "checks": {
+        "task_count": true,
+        "depth_shape": true,
+        "state_shape": true,
+        "depth_range": true,
+        "state_finite": true,
+        "action_contract": true,
+        "shared_clue": true,
+        "teammate_slots": true,
+        "collision_vector": true,
+        "score_vector": true,
+        "score_range": true,
+        "score_is_mean": true
+      },
+      "pass": true
+    }
+  ],
+  "elapsed_sec": 53.26192540000193,
+  "pass": true,
+  "limitations": [
+    "本报告直接运行原生 Python/PyBullet 链路，不包含 Docker/Cap'n Proto RPC 隔离层。",
+    "零动作短步矩阵用于验证环境、contract、shared clue、碰撞字段和评分接线，不代表策略成功率。"
+  ]
+}
