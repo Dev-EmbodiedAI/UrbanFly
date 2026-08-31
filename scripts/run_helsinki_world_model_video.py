@@ -28,6 +28,16 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "uav_wm_navigation" / "src"))
 
+CANONICAL_TASK_TYPES = frozenset(
+    {
+        "building_blocked",
+        "street_canyon",
+        "rooftop_to_ground",
+        "ground_to_rooftop",
+        "rooftop_to_rooftop",
+    }
+)
+
 from backend.engine.helsinki_frames import (  # noqa: E402
     backend_world_to_enu,
     enu_to_backend_world,
@@ -79,6 +89,15 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--video-speed", type=float, default=1.0)
     result.add_argument("--video-name", default="helsinki_rooftop_to_ground_world_model.mp4")
     return result
+
+
+def canonical_training_membership(episode_index: int) -> str:
+    if 80 <= episode_index <= 99:
+        return (
+            "held-out episode 080-099; selected episode was not used for "
+            "policy/world-model training"
+        )
+    return "training episode 000-079"
 
 
 def health() -> dict:
@@ -362,13 +381,15 @@ def main() -> None:
             raise ValueError("--qa is required when a canonical episode is selected")
         records = load_qa_episode_records(args.qa)
         record = next((item for item in records if item.episode_index == args.episode), None)
-        if record is None or record.task_type != "rooftop_to_ground":
-            raise ValueError("selected episode must be a canonical rooftop_to_ground route")
+        if record is None:
+            raise ValueError(f"canonical episode {args.episode} was not found")
+        if record.task_type not in CANONICAL_TASK_TYPES:
+            raise ValueError(f"unsupported canonical task type: {record.task_type}")
         contract = episode_contract(record)
         episode_index = record.episode_index
         episode_id = record.episode_id
         task_type = record.task_type
-        training_membership = "held-out episode 080-099; episode 097 was not used for policy/world-model training"
+        training_membership = canonical_training_membership(record.episode_index)
         planning_report = None
         goal_backend = enu_to_backend_world(contract["goal"])
         semantic_mission = SemanticMissionPlan.deterministic([goal_backend])

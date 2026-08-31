@@ -11,4 +11,5 @@ if (-not (Test-Path -LiteralPath $executable)) {
 }
 
 $env:URBANFLY_ROOT = $projectRoot
+$env:URBANFLY_START_MINIMIZED = "1"
 Start-Process -FilePath $executable -WorkingDirectory $projectRoot -WindowStyle Hidden

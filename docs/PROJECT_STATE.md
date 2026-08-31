@@ -2605,3 +2605,55 @@ DOCKER BENCHMARK NOT TESTED / DYNAMIC IMITATION BASELINE TRAINABLE BUT NOT TRAIN
 Current verdict: **`AGENT → LEARNED WORLD MODEL → HELSINKI EXECUTION → FRESH
 FEEDBACK CLOSED LOOP PASS / SWARM FIVE-ENV EXACT-GOAL DIGITAL TWIN PASS /
 FORMAL CROSS-DOMAIN GENERALIZATION NOT YET QUALIFIED`**.
+
+## 38. Helsinki 低空建筑走廊穿梭演示（2026-08-31）
+
+### 38.1 路线筛选与 runner 泛化
+
+- 用户要求的不只是楼顶上方巡航，而是能在视频中明确看到建筑立面、树列、车辆、
+  路口与局部避障的低空城市穿梭。对 canonical Dataset v1 的 20 条
+  `street_canyon` 和 20 条 `building_blocked` 真实 RGB 中段进行临时视觉筛选后，
+  发现很多 `street_canyon` 实际位于水道、绿地或宽路，不能仅凭任务标签声称是
+  建筑街谷。
+- `PASS` — `scripts/run_helsinki_world_model_video.py` 已从仅允许
+  `rooftop_to_ground` 的旧演示限制，泛化为五类 canonical 任务均可运行，并根据
+  episode 索引自动标记 training/held-out；这只修改 runner，不改变任何 frozen
+  planner/controller/geometry/sampler/Local Goal 核心。
+- `PASS` — `scripts/launch_desktop.ps1` 现在显式设置
+  `URBANFLY_START_MINIMIZED=1`，实测可在不抢鼠标的情况下启动恰好一个 hidden、
+  ready 的离屏传感器表面。
+
+### 38.2 最终 held-out 建筑走廊结果
+
+- `PASS` — 最终主演示选择 canonical episode **095**，任务类型
+  `building_blocked`，属于 held-out 080–099，未参与 policy/World Model 训练。
+  历史专家轨迹约 127.5 m，高度约 10.3–17.8 m，最小 clearance 约 5.9 m；路线
+  从住宅楼立面旁进入道路/停车区走廊，经过树列、车辆和城市路口。
+- `PASS` — 新闭环在 **177** 步到达，最终 goal distance **2.956 m**，最大
+  cross-track **5.842 m**；抽样实际高度 **10.74–15.06 m**。0 collision、0 stale
+  action，后台独立安全层真实介入 **3** 次。
+- `PASS` — learned latent World Model 重排 **177/177** 步，并在 **156** 步改变
+  base policy 选择；Agent causal chain complete，fresh feedback **177/177**。
+- `PASS` — 主视频：
+  `outputs/digital_twin_platform_v1/helsinki_building_canyon_095/helsinki_building_canyon_world_model_2x.mp4`。
+  连续浏览器录制，非截图拼接；1920×1080、30 FPS、674 frames、2×、
+  **22.467 s**、8,533,850 bytes，SHA256
+  `4b605bafbf3b66711286c8f27cf95e2852e7f8e6348703e890f286fe7d1715e5`。
+  独立哈希一致；3 s / 11 s / 19 s 抽帧人工确认第三视角、机载 RGB、Depth 和
+  192-D latent/候选风险四屏均有效，且建筑立面持续处于近距离视野。
+- `PASS (honest comparison)` — 先运行的 held-out episode 086 也通过，243 步、
+  5 次安全介入，但人工视觉 QA 发现主体是水道/桥梁走廊；episode 076 的建筑
+  视觉更明显但属于 training 路线。两者都没有被冒充成最终 held-out 建筑演示，
+  筛选视频与临时联系表在 095 PASS 后移出项目，仅保留主成品；开发运行日志也
+  移到 `C:/Users/caste/AppData/Local/Temp/UrbanFly_cleanup_20260831`。结束时
+  simulator stopped、policy 0，专用 hidden desktop/backend 进程均已关闭。
+- `PASS` — runner/adapter/Agent/Swarm/latent World Model 最终聚焦回归仍为
+  **23/23 PASS**，runner 显式 `py_compile` 通过。
+- `LIMITATION` — 当前 Helsinki 资产主要是中低层住宅与道路，不是香港式高密
+  摩天楼峡谷；本结果证明真实低空建筑走廊闭环和安全介入，不等于动态行人/车辆
+  预测避障或多 seed 的低空统计泛化。后续可增加经三角网格验证的多转弯街谷
+  scenario suite，而不是通过降低安全阈值制造危险画面。
+
+Current verdict: **`HELD-OUT LOW-ALTITUDE BUILDING-CORRIDOR CLOSED LOOP PASS /
+VISIBLE OBSTACLE CONTEXT AND SAFETY INTERVENTION PASS / DENSE HIGH-RISE AND
+DYNAMIC-OBSTACLE GENERALIZATION NOT YET QUALIFIED`**.

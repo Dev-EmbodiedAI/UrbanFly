@@ -9,7 +9,11 @@ from backend.digital_twin import HelsinkiDigitalTwinAdapter
 
 
 def test_formal_helsinki_video_uses_validated_command_horizon_by_default():
-    from scripts.run_helsinki_world_model_video import parser
+    from scripts.run_helsinki_world_model_video import (
+        CANONICAL_TASK_TYPES,
+        canonical_training_membership,
+        parser,
+    )
 
     args = parser().parse_args(
         [
@@ -22,6 +26,9 @@ def test_formal_helsinki_video_uses_validated_command_horizon_by_default():
         ]
     )
     assert args.action_duration_s == 0.5
+    assert "street_canyon" in CANONICAL_TASK_TYPES
+    assert canonical_training_membership(86).startswith("held-out")
+    assert canonical_training_membership(51) == "training episode 000-079"
 
 
 class FakeHelsinkiRawAdapter:
