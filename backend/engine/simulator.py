@@ -2112,6 +2112,9 @@ class Simulator:
             "planner_latency_ms": float(max(0.0, visualization.get("planner_latency_ms", 0.0))),
             "predicted_risk": float(np.clip(visualization.get("predicted_risk", 0.0), 0.0, 1.0)),
             "control_authority": str(visualization.get("control_authority", "candidate_reranker_only")),
+            "scene_candidate_overlay": bool(
+                visualization.get("scene_candidate_overlay", True)
+            ),
             "visualization_only": True,
         }
         latent = np.asarray(visualization.get("latent_state", []), dtype=float)

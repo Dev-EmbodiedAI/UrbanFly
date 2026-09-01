@@ -75,6 +75,15 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--custom-start-backend", type=float, nargs=3)
     result.add_argument("--custom-goal-backend", type=float, nargs=3)
     result.add_argument("--via-backend", type=float, nargs=3, action="append", default=[])
+    result.add_argument(
+        "--custom-expert-mode",
+        choices=("high_altitude", "low_altitude_3d"),
+        default="high_altitude",
+    )
+    result.add_argument("--custom-altitude-min-m", type=float, default=4.5)
+    result.add_argument("--custom-altitude-max-m", type=float, default=25.0)
+    result.add_argument("--qualified-route", type=Path)
+    result.add_argument("--route-qualification", type=Path)
     result.add_argument("--semantic-mission-plan", type=Path)
     result.add_argument("--output-dir", type=Path, required=True)
     result.add_argument("--max-steps", type=int, default=1400)
@@ -84,6 +93,12 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--action-duration-s", type=float, default=0.5)
     result.add_argument("--goal-tolerance-m", type=float, default=3.0)
     result.add_argument("--maximum-cross-track-m", type=float, default=15.0)
+    result.add_argument(
+        "--base-policy",
+        choices=("observation_policy", "kinematic_route_policy"),
+        default="observation_policy",
+        help="action proposal source; the learned world model still reranks all candidates",
+    )
     result.add_argument("--device", choices=("auto", "cuda", "cpu"), default="auto")
     result.add_argument("--recording-layout", default="rgbd_world_model")
     result.add_argument("--video-speed", type=float, default=1.0)
@@ -170,6 +185,35 @@ def candidate_actions(base: np.ndarray) -> np.ndarray:
         dtype=np.float32,
     )
     return np.clip(base[None] + offsets, -ACTION_LIMITS, ACTION_LIMITS)
+
+
+def kinematic_route_action(
+    local_goal_body_flu: np.ndarray,
+    linear_velocity_world_enu: np.ndarray,
+    orientation_xyzw: np.ndarray,
+) -> np.ndarray:
+    """Stable Local-Goal tracking policy for geometry-qualified demonstrations.
+
+    This is a policy option in the runner, not a change to the frozen Helsinki
+    controller or planner.  It supplies the centre action around which the
+    learned world model evaluates its bounded 15-action neighborhood.
+    """
+
+    goal = np.asarray(local_goal_body_flu, dtype=np.float64)
+    horizontal = goal[:2]
+    horizontal_distance = float(np.linalg.norm(horizontal))
+    direction = horizontal / max(horizontal_distance, 1e-6)
+    speed = float(np.clip(0.32 * horizontal_distance, 1.2, 4.0))
+    velocity_body = Rotation.from_quat(orientation_xyzw).inv().apply(
+        np.asarray(linear_velocity_world_enu, dtype=np.float64)
+    )
+    vertical = float(np.clip(0.75 * goal[2] - 0.35 * velocity_body[2], -2.0, 2.0))
+    heading_error = float(math.atan2(horizontal[1], max(horizontal[0], 1e-6)))
+    yaw_rate = float(np.clip(1.4 * heading_error, -ACTION_LIMITS[3], ACTION_LIMITS[3]))
+    return np.asarray(
+        [direction[0] * speed, direction[1] * speed, vertical, yaw_rate],
+        dtype=np.float32,
+    )
 
 
 def candidate_trajectory(position, orientation, delta_body, horizon_scale: float = 12.0):
@@ -299,6 +343,7 @@ def main() -> None:
         semantic_report = json.loads(args.semantic_mission_plan.read_text(encoding="utf-8"))
         semantic_mission = SemanticMissionPlan.from_report(semantic_report)
     custom_requested = args.custom_start_backend is not None or args.custom_goal_backend is not None
+    custom_route_source = "frozen Helsinki global planner; semantic mission planned segment by segment"
     if custom_requested:
         if args.custom_start_backend is None or args.custom_goal_backend is None:
             raise ValueError("custom start and goal must be supplied together")
@@ -326,21 +371,69 @@ def main() -> None:
             goal_backend,
         ]
         segments = []
-        route_backend_parts = []
-        for segment_index, (segment_start, segment_goal) in enumerate(
-            zip(mission_points[:-1], mission_points[1:])
-        ):
-            segment = stack.plan(
-                segment_start,
-                segment_goal,
-                expert_mode="high_altitude",
-                allow_layer_transitions=True,
+        qualification_report = None
+        if args.qualified_route is not None:
+            if args.route_qualification is None:
+                raise ValueError("--qualified-route requires --route-qualification")
+            qualification_report = json.loads(
+                args.route_qualification.read_text(encoding="utf-8")
             )
-            segments.append(segment)
-            route_backend_parts.append(
-                segment.trajectory if segment_index == 0 else segment.trajectory[1:]
+            if qualification_report.get("status") != "PASS":
+                raise RuntimeError("qualified route report is not PASS")
+            with np.load(args.qualified_route, allow_pickle=False) as payload:
+                route_backend = np.asarray(payload["planned_trajectory"], dtype=np.float64)
+            if route_backend.ndim != 2 or route_backend.shape[1] != 3 or len(route_backend) < 2:
+                raise ValueError("qualified route must contain an Nx3 planned_trajectory")
+            if not np.allclose(route_backend[0], start_backend, atol=1e-5) or not np.allclose(
+                route_backend[-1], goal_backend, atol=1e-5
+            ):
+                raise ValueError("qualified route endpoints do not match custom start/goal")
+            route_validation = stack.validate_path(
+                route_backend,
+                required_clearance=stack.required_clearance,
+                altitude_min_m=args.custom_altitude_min_m,
+                altitude_max_m=args.custom_altitude_max_m,
             )
-        route_backend = np.concatenate(route_backend_parts, axis=0)
+            triangle_validation = stack.local_triangle_geometry.trajectory_query(
+                route_backend, stack.required_clearance
+            ).as_dict()
+            if not route_validation["path_valid"] or triangle_validation["collision"]:
+                raise RuntimeError("qualified route failed independent runtime geometry audit")
+            custom_route_source = (
+                "geometry-qualified internal street graph; independently rechecked "
+                "against Helsinki heightmap and triangle mesh"
+            )
+        else:
+            route_backend_parts = []
+            for segment_index, (segment_start, segment_goal) in enumerate(
+                zip(mission_points[:-1], mission_points[1:])
+            ):
+                try:
+                    segment = stack.plan(
+                        segment_start,
+                        segment_goal,
+                        expert_mode=args.custom_expert_mode,
+                        altitude_min_m=(
+                            args.custom_altitude_min_m
+                            if args.custom_expert_mode == "low_altitude_3d"
+                            else None
+                        ),
+                        altitude_max_m=(
+                            args.custom_altitude_max_m
+                            if args.custom_expert_mode == "low_altitude_3d"
+                            else None
+                        ),
+                        allow_layer_transitions=True,
+                    )
+                except Exception as error:
+                    raise RuntimeError(
+                        f"custom route segment {segment_index} planning failed"
+                    ) from error
+                segments.append(segment)
+                route_backend_parts.append(
+                    segment.trajectory if segment_index == 0 else segment.trajectory[1:]
+                )
+            route_backend = np.concatenate(route_backend_parts, axis=0)
         route_enu = backend_world_to_enu(route_backend)
         start_enu = backend_world_to_enu(start_backend)
         goal_enu = backend_world_to_enu(goal_backend)
@@ -357,11 +450,22 @@ def main() -> None:
         task_type = "long_range"
         training_membership = "custom 1 km route; not a Dataset v1 training episode"
         planning_report = {
-            "path_length_m": float(sum(segment.path_length_m for segment in segments)),
+            "path_length_m": float(np.linalg.norm(np.diff(route_backend, axis=0), axis=1).sum()),
             "straight_planar_distance_m": float(np.linalg.norm((goal_enu - start_enu)[:2])),
             "trajectory_points": int(len(route_backend)),
             "waypoints_backend": [point.tolist() for point in mission_points],
             "segment_count": len(segments),
+            "expert_mode": args.custom_expert_mode,
+            "altitude_min_m": (
+                args.custom_altitude_min_m
+                if args.custom_expert_mode == "low_altitude_3d"
+                else None
+            ),
+            "altitude_max_m": (
+                args.custom_altitude_max_m
+                if args.custom_expert_mode == "low_altitude_3d"
+                else None
+            ),
             "segments": [
                 {
                     "path_length_m": float(segment.path_length_m),
@@ -371,6 +475,10 @@ def main() -> None:
                 for segment in segments
             ],
         }
+        if qualification_report is not None:
+            planning_report["route_qualification"] = qualification_report
+            planning_report["runtime_heightmap_validation"] = route_validation
+            planning_report["runtime_triangle_validation"] = triangle_validation
         if semantic_report is not None:
             planning_report["semantic_mission_plan"] = semantic_report
             planning_report["semantic_waypoints_consumed_by_route"] = True
@@ -428,11 +536,12 @@ def main() -> None:
         "policy": str(args.policy.resolve()),
         "world_model": str(args.world_model.resolve()),
         "world_model_control_authority": "15-candidate local action reranker only",
+        "base_policy": args.base_policy,
         "agent_control_authority": "semantic mission sequencing and fail-closed action authorization",
         "semantic_mission_consumed": semantic_report is not None,
         "backend_safety_shield": True,
         "global_route_source": (
-            "frozen Helsinki global planner; semantic mission planned segment by segment"
+            custom_route_source
             if custom_requested
             else "frozen planner route stored in canonical Dataset v1"
         ),
@@ -496,9 +605,19 @@ def main() -> None:
                 orientation_xyzw=state.orientation_xyzw[None],
                 previous_action_physical=previous_action[None],
             )[0]
-            latent, base_action, policy_started = policy_latent_and_action(
+            latent, learned_action, policy_started = policy_latent_and_action(
                 policy, rgb_history, depth_history, valid_history, features, device
             )
+            if args.base_policy == "kinematic_route_policy":
+                base_action = torch.from_numpy(
+                    kinematic_route_action(
+                        local_goal_body,
+                        state.linear_velocity,
+                        state.orientation_xyzw,
+                    )
+                ).to(device)
+            else:
+                base_action = learned_action
             decision = rerank(world_model, latent, base_action, state.position, state.orientation_xyzw, device)
             if device.type == "cuda":
                 torch.cuda.synchronize(device)
@@ -522,7 +641,9 @@ def main() -> None:
                 "candidate_count": 15,
                 "selected_index": decision["selected_index"],
                 "raw_selected_index": decision["raw_selected_index"],
-                "selection_method": "learned_latent_dynamics_ensemble",
+                "selection_method": (
+                    f"learned_latent_dynamics_ensemble_over_{args.base_policy}"
+                ),
                 "control_authority": "candidate_reranker_only",
                 "selected_trajectory_world_m": decision["top_candidates"][decision["selected_index"]]["trajectory_world_m"],
                 "top_candidates": decision["top_candidates"],
@@ -531,6 +652,7 @@ def main() -> None:
                 "ensemble_uncertainty": decision["selected_uncertainty"],
                 "latent_state": latent[0].detach().cpu().numpy().tolist(),
                 "predicted_next_latent": decision["next_latent"].tolist(),
+                "scene_candidate_overlay": False,
             }
             adapter.publish_policy_visualization(visualization)
             command_world = Rotation.from_quat(state.orientation_xyzw).apply(selected_action[:3])

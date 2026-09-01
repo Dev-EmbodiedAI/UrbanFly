@@ -3,6 +3,25 @@ import numpy as np
 from backend.engine.scenario import ScenarioEngine
 from backend.engine.simulator import Simulator
 from backend.config import MULTIROTOR_DYNAMICS
+from scripts.run_helsinki_world_model_video import kinematic_route_action
+
+
+def test_kinematic_route_policy_tracks_local_goal_with_bounded_3d_action():
+    identity = np.asarray([0.0, 0.0, 0.0, 1.0])
+    straight = kinematic_route_action(
+        np.asarray([20.0, 0.0, 3.0]), np.zeros(3), identity
+    )
+    assert np.allclose(straight, [4.0, 0.0, 2.0, 0.0])
+
+    left = kinematic_route_action(
+        np.asarray([10.0, 10.0, 0.0]), np.zeros(3), identity
+    )
+    assert left[0] > 0.0
+    assert left[1] > 0.0
+    assert left[3] > 0.0
+    assert np.all(
+        np.abs(left) <= np.asarray([6.0, 6.0, 3.0, np.deg2rad(60.0)]) + 1e-6
+    )
 
 
 def test_external_policy_action_is_auditable_and_times_out_to_hover():
@@ -133,12 +152,14 @@ def test_external_planner_visualization_exposes_all_candidates_without_changing_
         "top_candidates": candidates,
         "planner_latency_ms": 24.0,
         "predicted_risk": 0.15,
+        "scene_candidate_overlay": False,
     })
     assert accepted["visualization_only"] is True
     simulator.step()
     snapshot = simulator.get_state_snapshot()["drones"][0]["world_model"]
     assert snapshot["candidate_count"] == 15
     assert len(snapshot["top_candidates"]) == 15
+    assert snapshot["scene_candidate_overlay"] is False
     assert snapshot["selected_index"] == 3
     assert snapshot["raw_action_normalized"] == command["raw_action_normalized"]
     assert simulator._external_policy_commands[drone.id]["step_id"] == 0

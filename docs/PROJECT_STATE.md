@@ -2623,9 +2623,9 @@ FORMAL CROSS-DOMAIN GENERALIZATION NOT YET QUALIFIED`**.
   `URBANFLY_START_MINIMIZED=1`，实测可在不抢鼠标的情况下启动恰好一个 hidden、
   ready 的离屏传感器表面。
 
-### 38.2 最终 held-out 建筑走廊结果
+### 38.2 初步 held-out 建筑走廊结果（已被更严格目标取代）
 
-- `PASS` — 最终主演示选择 canonical episode **095**，任务类型
+- `PASS (historical preliminary)` — 当时主演示选择 canonical episode **095**，任务类型
   `building_blocked`，属于 held-out 080–099，未参与 policy/World Model 训练。
   历史专家轨迹约 127.5 m，高度约 10.3–17.8 m，最小 clearance 约 5.9 m；路线
   从住宅楼立面旁进入道路/停车区走廊，经过树列、车辆和城市路口。
@@ -2657,3 +2657,61 @@ FORMAL CROSS-DOMAIN GENERALIZATION NOT YET QUALIFIED`**.
 Current verdict: **`HELD-OUT LOW-ALTITUDE BUILDING-CORRIDOR CLOSED LOOP PASS /
 VISIBLE OBSTACLE CONTEXT AND SAFETY INTERVENTION PASS / DENSE HIGH-RISE AND
 DYNAMIC-OBSTACLE GENERALIZATION NOT YET QUALIFIED`**.
+
+## 39. 城市核心单向迷宫路线与真实执行边界（2026-09-01）
+
+### 39.1 用户最终定义与路线 Gate
+
+- 用户明确否定 episode 095 和早期沿边/折返方案；新目标是城市楼宇中间单向穿梭，
+  不走回头路，并且至少包含 10 个运动学有效转弯。episode 095 仍是历史闭环 PASS，
+  但只属于初步低空演示，不能再称为该新目标的最终结果。
+- `PASS (geometry only)` — 新增
+  `scripts/plan_helsinki_building_canyon_demo.py`，从 Helsinki 高度图提取大建筑代理、
+  街道可飞区和一像素道路中心骨架，再搜索自避让单向路线。硬 Gate 包含：路径至少
+  300 m、起终点平面分离至少 150 m、路径/位移比不超过 2.7、源网格/边和轨迹重入
+  均为 0、低于 30 m、严格建筑区覆盖、双侧建筑、独立 heightmap/triangle 审计，
+  以及至少 10 个夹角 >=20 度且转弯前后航段均 >=18 m 的运动学转弯。
+- `PASS (geometry only)` — 最佳一次性路线为 703.801 m，起终点平面分离
+  451.359 m，路径/位移比 1.559，11 个严格运动学转弯（22 个含短修正的几何转弯），
+  双侧建筑比例 81.56%，重复网格/边/轨迹重入均为 0；27 m 恒高，heightmap 最小
+  clearance 9.207 m，triangle 最小距离 6.635 m，无规划碰撞。诊断目录为
+  `outputs/digital_twin_platform_v1/helsinki_building_maze_oneway_route_v11_20260901`。
+- `PASS` — 总览 PNG 只画单条规划主线、起点和终点，不再把 World Model 候选或
+  dense/strict contour 叠到主地图。前端仍保留候选 telemetry，但正式 3-D 场景可由
+  `scene_candidate_overlay=false` 隐藏候选线。冻结 Global Planner、Privileged
+  Expert、triangle geometry、controller、sampler 和 Local Goal 核心均未修改。
+
+### 39.2 真实闭环验收（FAIL，不能发布为成功视频）
+
+- `FAIL` — 704 m / 11 转弯路线使用原 observation policy 实飞两次：8 m Gate 在
+  step 55 以 8.288 m fail-closed；15 m 既有长程 Gate 在 step 623 以 15.033 m
+  fail-closed。第二次有 7 次安全介入，剩余路线停在约 432.8 m，高度随后从约
+  18.6 m 持续下降到 12.3 m；0 stale action，未把中止视频当成成品。
+- `FAIL` — 将道路中心的 triangle 余量提升到 6 m 并保持 11 个严格转弯后，原
+  observation policy 在 step 539 再次以 cross-track 15.024 m 中止；12 次安全介入，
+  0 stale。10 m triangle 中心余量时只能得到 424 m / 6 转弯；8 m 余量时只能得到
+  602 m / 7 转弯，二者均因达不到 10 转弯 Gate 而 `NOT_READY`。
+- `IMPLEMENTED, RUNTIME FAIL` — runner 增加可选
+  `kinematic_route_policy`：它从 Local Goal、姿态和速度提出稳定 3-D 速度/偏航动作，
+  learned latent World Model 仍对 15 个邻域动作逐步预测并重排，独立 backend safety
+  shield 保持启用。这是 runner policy 插件，不是对冻结 controller/planner 的修改。
+  相关回归 20/20 PASS；但真实飞行在 step 289 发生 collision（此前最大 cross-track
+  7.616 m、4 次安全介入、0 stale），所以该模式没有被宣布为 PASS。
+- `PASS (cleanup)` — 除上述一份几何诊断外，本轮生成的失败路线、空启动目录和失败
+  MP4/QA 均移到可恢复临时清理目录；项目内不保留失败视频堆积。运行结束 simulator
+  stopped、policy=0，仍只有一个 hidden ready sensor surface。
+- `PASS` — 前端回归 20/20，Vite production build PASS；聚焦 Python 闭环/adapter/
+  World Model/新 kinematic policy 回归 20/20，两个相关脚本 `py_compile` PASS。
+
+### 39.3 当前阻塞与下一里程碑
+
+- `P1 BLOCKER` — 当前 100 条主数据和 observation policy 没有覆盖足够的多连续弯、
+  狭窄楼宇走廊恢复动作；安全介入后的 hover/动作序列还会出现持续掉高。几何规划
+  已能生成合格迷宫路线，但“规划可飞”尚未转化为“闭环可安全执行”。
+- `NEXT` — 不再放宽 collision/cross-track Gate。下一步需要用这类路线生成受控 teacher
+  数据（含转弯进入、转弯退出和安全恢复），训练/DAgger 一个真正的路线跟踪 policy，
+  并在独立路线集上先做 >=10 条真实闭环 QA；只有 0 collision、0 stale、完整到达后
+  才重新录制正式四分屏 3x 视频。Qwen API 仍只负责高层任务/途经点，不进入低层安全。
+
+Current verdict: **`ONE-WAY URBAN MAZE GEOMETRY PASS / 11 KINEMATIC TURNS PASS /
+REAL CLOSED-LOOP EXECUTION FAIL / NOT READY FOR FINAL VIDEO`**.

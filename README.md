@@ -180,7 +180,7 @@ UrbanFly 的系统主线始终是 **Agent 能力 + Action-Conditioned World Mode
 - HDF5 独立回读通过，损坏文件为 0，`.partial` 为 0。
 - 长程世界模型演示成功到达目标地面，并保留完整飞行质量报告。
 - 最新平台化 Helsinki 1 km 闭环为 1,114 步，World Model 参与 1,114/1,114 次动作重排并改变 633 次选择；4/4 语义途径点完成，0 collision、0 stale action，最终目标距离 2.634 m，四分屏 3× 视频独立回读通过。
-- 低空建筑走廊 held-out 演示使用 canonical episode 095：实际高度约 10.74–15.06 m，World Model 177/177 步参与并改变 156 次动作选择，后台安全层介入 3 次，0 collision、0 stale action，2× 四分屏视频独立回读通过。
+- canonical episode 095 是已完成的低空 held-out **初步**演示：实际高度约 10.74–15.06 m，World Model 177/177 步参与，0 collision、0 stale action；它不满足后来提出的“城市核心单向迷宫、至少 10 个运动学转弯”要求，因此不再称为最终建筑穿梭演示。2026-09-01 的新几何路线已做到 704 m、11 个严格转弯和零重复，但真实闭环发生碰撞，当前结论仍是 `NOT READY`。
 
 精确数值、哈希和输入目录记录在 Release manifest、主数据集 `dataset_qa.json` 及 `docs/PROJECT_STATE.md` 中。
 

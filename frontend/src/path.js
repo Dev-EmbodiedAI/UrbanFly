@@ -178,6 +178,13 @@ export class PathVisualizer {
       this.clearWorldModel(droneId);
       return;
     }
+    // Candidate rollouts remain available in telemetry and in the dedicated
+    // World Model panel. Long-range recordings keep them out of the shared
+    // 3-D scene so the stable global route and factual trace stay readable.
+    if (worldModel.scene_candidate_overlay === false) {
+      this.clearWorldModel(droneId);
+      return;
+    }
     const existing = this.worldModelPredictions.get(droneId);
     if (existing?.sequence === worldModel.decision_sequence) return;
     const now = performance.now();

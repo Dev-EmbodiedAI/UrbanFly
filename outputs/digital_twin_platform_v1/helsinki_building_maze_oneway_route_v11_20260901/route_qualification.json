@@ -1,0 +1,213 @@
+{
+  "schema": "urbanfly-building-canyon-route-qualification-v1",
+  "status": "PASS",
+  "selection_gate": {
+    "minimum_path_length_m": 300.0,
+    "minimum_straight_planar_distance_m": 150.0,
+    "maximum_path_to_displacement_ratio": 2.7,
+    "maximum_source_graph_repeated_cell_count": 0,
+    "maximum_source_graph_repeated_edge_count": 0,
+    "maximum_trajectory_reentered_grid_cell_count": 0,
+    "maximum_trajectory_repeated_edge_count": 0,
+    "maximum_altitude_m": 30.0,
+    "minimum_triangle_distance_m": 4.0,
+    "minimum_graph_triangle_center_clearance_m": 6.0,
+    "minimum_heightmap_clearance_m": 6.0,
+    "minimum_strict_building_district_route_ratio": 0.6,
+    "minimum_mean_large_building_coverage": 0.25,
+    "minimum_mean_obstacle_coverage": 0.12,
+    "minimum_bilateral_building_ratio": 0.3,
+    "minimum_encountered_large_building_count": 2,
+    "minimum_kinematic_turn_count": 10,
+    "kinematic_turn_minimum_incoming_and_outgoing_leg_m": 18.0,
+    "minimum_total_turn_angle_degrees": 60.0
+  },
+  "selected": {
+    "index": "corridor_component_1",
+    "task_type": "street_canyon_graph",
+    "start": [
+      -357.5,
+      27.0,
+      277.5
+    ],
+    "goal": [
+      -72.5,
+      27.0,
+      -72.5
+    ],
+    "altitude_min_m": 4.5,
+    "altitude_max_m": 30.0,
+    "spatial_stratum": "large_building_street_component",
+    "path_length_m": 703.8013052147192,
+    "straight_planar_distance_m": 451.3590588434002,
+    "path_to_displacement_ratio": 1.5592936298170195,
+    "trajectory_reentered_grid_cell_count": 0,
+    "trajectory_repeated_edge_count": 0,
+    "source_graph_repeated_cell_count": 0,
+    "source_graph_repeated_edge_count": 0,
+    "trajectory_points": 320,
+    "minimum_heightmap_clearance_m": 9.206918716430664,
+    "minimum_triangle_distance_m": 6.634593347078336,
+    "triangle_collision": false,
+    "minimum_altitude_m": 27.0,
+    "maximum_altitude_m": 27.0,
+    "dense_core_route_ratio": 0.1347517730496454,
+    "strict_building_district_route_ratio": 1.0,
+    "mean_large_building_coverage": 0.5192119479179382,
+    "mean_route_obstacle_coverage": 0.8135539868199233,
+    "p25_route_obstacle_coverage": 0.7244444489479065,
+    "mean_route_density_score": 0.6898027085666115,
+    "bilateral_building_ratio": 0.8156028368794326,
+    "encountered_large_building_count": 2,
+    "turn_count": 11,
+    "total_turn_angle_degrees": 527.631333802777,
+    "geometric_turn_count_including_short_grid_corrections": 22,
+    "geometric_turn_angle_degrees": 1092.0752885831935,
+    "kinematic_turn_minimum_incoming_and_outgoing_leg_m": 18.0,
+    "minimum_kinematic_leg_m": 5.0,
+    "mean_kinematic_leg_m": 23.141679520063796,
+    "minimum_graph_triangle_center_clearance_m": 6.0,
+    "planner_mode": "geometry_weighted_street_graph_then_frozen_safe_smoothing",
+    "segment_count": 18,
+    "mission_waypoints_backend": [
+      [
+        -357.5,
+        27.0,
+        277.5
+      ],
+      [
+        -391.0615088610781,
+        27.0,
+        253.5274936706585
+      ],
+      [
+        -383.40909090909093,
+        27.0,
+        221.5909090909091
+      ],
+      [
+        -365.7425155557106,
+        27.0,
+        186.680517083469
+      ],
+      [
+        -334.48417824550114,
+        27.0,
+        159.947961520369
+      ],
+      [
+        -295.08899765088245,
+        27.0,
+        154.29842823584036
+      ],
+      [
+        -267.5,
+        27.0,
+        153.49890284868718
+      ],
+      [
+        -257.31258289547543,
+        27.0,
+        118.47317875908197
+      ],
+      [
+        -222.5,
+        27.0,
+        136.25
+      ],
+      [
+        -200.87939230691788,
+        27.0,
+        161.7659747256066
+      ],
+      [
+        -167.03370266286004,
+        27.0,
+        154.126962130288
+      ],
+      [
+        -133.85278776053806,
+        27.0,
+        130.06852517369202
+      ],
+      [
+        -95.626225702292,
+        27.0,
+        119.063112851146
+      ],
+      [
+        -87.5,
+        27.0,
+        88.5
+      ],
+      [
+        -89.93835723325272,
+        27.0,
+        51.275491822437196
+      ],
+      [
+        -98.93986155745387,
+        27.0,
+        12.526109920863767
+      ],
+      [
+        -90.0,
+        27.0,
+        -20.0
+      ],
+      [
+        -88.73815139135912,
+        27.0,
+        -58.16647013024308
+      ],
+      [
+        -72.5,
+        27.0,
+        -72.5
+      ]
+    ],
+    "corridor_component_cells": 636,
+    "corridor_context_threshold": 0.16,
+    "weighted_geodesic_cost": 1176.975719165681,
+    "geometry_selected_district_center_cell": [
+      20,
+      103
+    ],
+    "geometry_selected_district_center_backend": [
+      -397.5,
+      20.0,
+      17.5
+    ],
+    "geometry_selected_district_radius_m": 350.0,
+    "geometry_selected_district_building_coverage": 0.8527489304542542,
+    "qualified": true,
+    "rank_score": 7.326891263917829
+  },
+  "candidate_count_requested": 0,
+  "candidate_count_planned": 1,
+  "qualified_candidate_count": 1,
+  "failures": [],
+  "density_summary": {
+    "neighborhood_m": 75.0,
+    "edge_exclusion_m": 100.0,
+    "core_score_threshold": 0.6480138897895813,
+    "dense_core_cell_ratio": 0.0864,
+    "peripheral_mixed_cell_ratio": 0.376575,
+    "non_open_cell_ratio": 0.502475,
+    "score_percentiles": {
+      "25": 0.0,
+      "50": 0.15056166052818298,
+      "75": 0.6782431602478027,
+      "90": 0.760791003704071,
+      "95": 0.7846828699111938
+    },
+    "mean_core_obstacle_density": 0.5556455850601196,
+    "mean_core_boundary_distance_m": 251.42071533203125
+  },
+  "building_proxy": {
+    "minimum_connected_high_surface_area_m2": 500.0,
+    "local_coverage_window_m": 75.0,
+    "strict_coverage_threshold": 0.16,
+    "strict_mask_cell_ratio": 0.2913
+  }
+}
