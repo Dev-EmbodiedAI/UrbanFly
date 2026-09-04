@@ -14,6 +14,7 @@ import { SemanticFleetRenderer } from './semantic_fleet.js';
 import { RuntimeRecorder } from './runtime_recorder.js';
 import { RuntimeHealth } from './runtime_health.js';
 import { bindHostLifecycle } from './host_lifecycle.js';
+import { BusinessNodeAnnotationController } from './semantic_annotations.js';
 
 const state = {
   drones: [],
@@ -54,6 +55,7 @@ async function init() {
     sceneManager,
     (status) => uiManager.setTwinStatus(status),
   );
+  const semanticAnnotations = new BusinessNodeAnnotationController({ sceneManager, digitalTwin });
 
   let backendActive = false;
   let lastUiUpdate = 0;

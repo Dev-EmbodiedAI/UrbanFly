@@ -3,10 +3,10 @@
 Last audited: 2026-08-28, Asia/Shanghai  
 Workspace root: `D:\AI\UrbanFly`
 
-Latest operational handoff: **section 30**. Earlier sections are historical.
-Collection was explicitly resumed toward 100 episodes; consult the section 30
-job/progress files and live process state for the current count. The integrated
-performance target is **not yet met**.
+Latest operational handoff: **section 47**. Earlier sections are historical.
+Bulk collection and training are STOPPED. Only bounded motion/interface pilots
+are authorized; consult section 47 and live job files. The integrated near-ground
+building-interior navigation/data target is **not yet met**.
 
 This file is the persistent project handoff. A fresh session must read `AGENTS.md`, then this file completely, then inspect the current code and outputs before proposing changes.
 
@@ -14,8 +14,8 @@ This file is the persistent project handoff. A fresh session must read `AGENTS.m
 
 ### Repository state
 
-- `LIMITATION` — `D:\AI\UrbanFly` currently has no `.git` directory. A real `git status`, baseline diff, tracked/untracked classification, and commit reference are unavailable.
-- `LIMITATION` — the modified/new-file inventory below is based on the completed work record, current files, and timestamps. It is not a Git-derived exhaustive diff.
+- `PASS` — `D:\AI\UrbanFly` contains a Git repository on branch `main`; the current handoff was audited with real `git status` and commit history.
+- `LIMITATION` — the working tree also contains pre-existing collection, motion-quality, and diagnostic changes outside this milestone. They must not be reverted or included in a semantic-annotation-only change without explicit review.
 - `PASS` — all key Helsinki assets, code modules, regression records, and audit outputs listed below exist and were read during this handoff.
 - `PASS` — this handoff session changed only `AGENTS.md` and `docs/PROJECT_STATE.md`. It did not change business code, start a new experiment, train a model, or collect new data.
 
@@ -2715,3 +2715,375 @@ DYNAMIC-OBSTACLE GENERALIZATION NOT YET QUALIFIED`**.
 
 Current verdict: **`ONE-WAY URBAN MAZE GEOMETRY PASS / 11 KINEMATIC TURNS PASS /
 REAL CLOSED-LOOP EXECUTION FAIL / NOT READY FOR FINAL VIDEO`**.
+
+## 40. 深度 P0 修复与 5 米级近地 700 米实飞（2026-09-03）
+
+### 40.1 深度根因与修复
+
+- `P0 FIXED` — `frontend/src/drone_sensors.js` 对 Three r170
+  `RGBADepthPacking` 的解码权重顺序写反：原实现把 A 当最高有效分量、R 当最低有效
+  分量；Three 实际以 R 为最高有效分量。深度 pass 同时沿用视觉背景清屏，导致无命中
+  像素没有稳定表示为 far plane。两者会把普通建筑/背景像素错误压到 0.3 m near clip，
+  再被 Turbo 色表显示为大面积红墙。
+- `PASS` — 深度 pass 现在临时移除视觉背景、以 RGBA 白色清成 120 m far plane，
+  使用与 Three `unpackRGBAToDepth` 一致的 R→A 权重解码，并在 finally 中恢复场景
+  背景和 renderer clear state。原始模型/数据输入仍是米制 float32 深度，不是颜色图。
+- `PASS` — 实时传感器预览、浏览器录屏和 HDF5 回放都改为单调对数灰度显示；颜色
+  不再伪装成模型输入。前端回归 **22/22 PASS**，production Vite build PASS。
+- `PASS` — 修复后真实隐藏 WebView2 探针 6 帧 / 86,400 depth pixels：finite 100%，
+  near-clip、<2 m、<5 m、<10 m 比例均为 0；最小/P50/P75 为
+  **18.611/109.188/120.0 m**，far-plane 比例 48.55%。对照修复前 maze teacher
+  HDF5，60.25% 像素同时小于 2/5/10/20 m，P50 仅 0.560 m，属于明确错误深度。
+- `PASS` — Dataset v1 validator 新增 near-clip 饱和门禁；新写出的 HDF5 自动携带
+  `urbanfly-depth-perspective-v2` 契约，明确 Three 版本、RGBA 顺序、空像素、单位和
+  near/far clip。资格 schema 同时支持 building-canyon 与 near-ground route。
+
+### 40.2 旧 Dataset / 模型结论作废边界
+
+- `FAIL` — 历史 canonical 100-episode Dataset v1 全部早于本次 P0 修复，100/100
+  缺少 `urbanfly-depth-perspective-v2` 契约；75/100 还超过新的每 episode 1%
+  near-clip 饱和门禁。聚合 near-clip 比例 1.1075%，episode 中位 1.2010%。报告：
+  `outputs/runtime_depth_fix_20260903/legacy_dataset_depth_audit.json`。
+- `FAIL` — `models/helsinki_observation_policy_v1.pt` 和
+  `models/helsinki_latent_world_model_v1.pt` 基于上述旧深度数据训练，不能继续支持
+  “修复后深度导航”或 5 米 AGL 的 learned-policy 结论。权重保留供审计，不删除；
+  必须用新契约数据重训。
+- `LIMITATION` — 本节没有声称历史 RGB、状态、动作、时间戳或几何标签全部错误；
+  被否决的是深度观测及依赖它的 learned-policy/world-model 结论。
+
+### 40.3 5 米级地形跟随路线与真实执行
+
+- `PASS (geometry)` — 新增 `scripts/qualify_helsinki_near_ground_route.py`，在原
+  703.8 m / 11 有效转弯 / 零重入楼宇路线的平面拓扑上，根据 2.5 m UAV 安全半径
+  内最高表面构造 5.0 m AGL 下界，并生成最大纵向坡度 0.25 的最低 Lipschitz 高度
+  包络。新路线 718.203 m，世界高度 9.529–22.793 m，绝不是 27/40 m 恒高巡航；
+  heightmap 和 triangle swept-volume 均通过，规划 triangle 最小距离 3.995 m。
+- `PASS (real privileged-teacher execution)` — 修复深度后在唯一隐藏 WebView2
+  传感器表面完成整条路线：**702.878 m 实际轨迹、195.2 s、1,952 transition、
+  成功到达、最终误差 2.134 m、0 collision、0 stale action、最小净距 4.034 m**。
+  相对 2.5 m 安全包络的实际 AGL P05/P50/P95 为 **5.091/6.622/12.746 m**；
+  相对脚下单点表面的 P05/P50/P95 为 **5.850/8.887/16.294 m**。两种定义都保留，
+  不以世界坐标高度冒充 AGL。
+- `PASS` — 整段修复后深度 near-clip 和 <2 m 比例均为 0，最小/P05/P50 深度为
+  **5.089/9.265/28.211 m**，120 m far-plane 比例 28.26%。物理实飞报告：
+  `outputs/helsinki_maze_teacher_v1/near_ground_5m_corrected_depth_001_20260903/physical_flight_qa.json`。
+- `PASS (video)` — 直接从同步 HDF5 生成 1,952 帧、960×450、10 FPS、195.2 s
+  RGB + 原始米制灰度 Depth + AGL + action/clearance 遥测视频：
+  `outputs/helsinki_maze_teacher_v1/near_ground_5m_corrected_depth_001_20260903/near_ground_5m_rgbd_telemetry.mp4`，
+  SHA256 `ee329f0ad80cf7eab47bc9db2dabe3ea605a1bf4678ca875c8d59453de762859`。
+  首/中/尾帧均可解码且人工确认包含真实楼宇 RGB、连续深度轮廓和末帧 SUCCESS。
+- `FAIL (Dataset training qualification only)` — 该物理飞行在修复后、但在新增
+  HDF5 depth contract 代码之前启动，因此文件内缺少 v2 契约；它保留为带源码哈希的
+  物理执行证据，不进入训练。最初关闭时的 `collection_failure.json` 还记录过新
+  near-ground qualification schema 未登记导致的 `split_leakage`；schema 修复后旧
+  transition integrity 一度通过，但最终训练资格仍因缺少 depth contract fail-closed。
+- `PASS` — 聚焦 Python 回归 **12/12 PASS**，覆盖 Three 深度顺序、near-clip
+  Dataset 门禁、两种 route qualification schema、AGL 高度包络和灰度显示；相关
+  Python `py_compile` PASS。
+
+### 40.4 当前结论与下一硬 Gate
+
+- `PASS` — 已实际证明 Helsinki 楼宇区内 5 米级安全包络 AGL、超过 300 m 的
+  单向长程 6-DOF 飞行可完成；实际距离为 702.878 m，而非高空直线演示。
+- `NOT TESTED` — 尚未证明 learned policy 使用修复后的深度在独立 300 m+、5 米级
+  AGL 楼宇路线完成飞行。本节的动作来自 privileged teacher，不能冒充深度策略成功。
+- `NEXT` — 先以 v2 depth contract 采集多条 5 米级 AGL teacher/recovery 路线，
+  做深度/AGL/转弯/安全恢复分布 QA；随后从零重训 observation policy 和
+  action-conditioned world model。最终 Gate 必须是 held-out 楼宇路线 >=300 m、
+  实际 AGL 逐帧审计、0 collision、0 stale、完整到达，并记录 depth 对动作的真实影响。
+
+Current verdict: **`DEPTH P0 FIXED / 5 M-CLASS AGL 702.9 M REAL TEACHER FLIGHT PASS /
+LEGACY DEPTH MODELS INVALID FOR NEW CLAIMS / HELD-OUT LEARNED DEPTH FLIGHT NOT TESTED`**.
+
+## 43. 500 条数据长程楼宇穿梭目标复核（2026-09-03）
+
+- `FAIL (scope)` — 用户人工检查 RGB-D 视频后指出 500 条轨迹主要沿街区边缘短程飞行，
+  不等价于 702.9 m 基准所展示的长程、连续楼宇穿梭。随后对全部 500 个有效 HDF5
+  做实际轨迹审计，确认该批数据不能支持原定目标。
+- `FAIL (distance)` — 500 条实际航程 P50 约 172.3 m，最长 353.1 m；仅 17/500
+  达到 300 m，0/500 达到 500 m。最关键的 `street_canyon` 与 `building_blocked`
+  两类均为 **0/100 达到 300 m**，其最大值分别仅 235.4 m 和 236.1 m。
+- `FAIL (low-altitude coverage)` — `street_canyon` safety-envelope AGL 中位数约
+  8.61 m，单条轨迹处于 4–8 m AGL 的帧比例中位数约 43.4%；这不能声明为完整的
+  5 m 级长程任务。
+- `ROOT CAUSE` — `collect_helsinki_dataset_v1.py::_plan_smoke_tasks` 将候选端点距离
+  固定为 `distance_range_override=(60.0, 210.0)`；候选排序只按起终点网格覆盖和
+  端点分离度，没有对实际规划航程 >=300 m、路线内部建筑密度、连续转弯数、街谷
+  驻留长度或距地图边界设硬门禁。五类任务标签和垂直变化契约因此没有保证长程楼宇
+  穿梭拓扑。
+- `DECISION` — 本批 500 条保留作短程/高度转换数据，但不得称为满足用户目标的正式
+  长程楼宇穿梭数据集，也不得据此启动正式模型训练。原 `urbanfly-500` 采集/训练
+  campaign 应视为目标不合格，而不仅是 QA stale 清单问题。
+- `NEXT HARD GATE` — 在再次大规模采集前，先生成并审计小批长程路线：每条实际规划
+  路径 >=300 m、优先 500–800 m，5 m-class safety-envelope AGL 有明确逐帧占比门禁，
+  同时要求路线内部楼宇密度/街谷驻留、连续有效转弯和边界距离。先交付路线俯视图及
+  真实 RGB-D 试飞视频供人工确认，通过后才允许扩展到 500 条。
+- `PASS (visual evidence)` — 已用同一 Helsinki 最高表面地图、同一 backend 坐标系
+  输出 702.9 m 实际航线、500 条实际航线全集以及叠加对照图，且逐张完成视觉检查。
+  输出目录：`outputs/helsinki_dataset_v2/long_range_route_scope_audit_20260903/`；机器可读
+  审计为 `route_scope_audit.json`，状态明确为 `FAIL_LONG_RANGE_SCOPE`。
+
+Current verdict: **`500 SHORT-RANGE COLLECTION COMPLETE BUT REJECTED FOR LONG-RANGE
+URBAN-TRAVERSAL GOAL / DO NOT TRAIN / NEW LONG-RANGE PILOT REQUIRED`**.
+
+## 44. 1,000 条长程楼宇内部数据任务（2026-09-03）
+
+- 用户明确要求 1,000 条合理数据，至少 500 条为楼宇街区内部穿梭，并包含大量长程
+  导航；继续保留低到低、高到低、低到高和屋顶到屋顶等三维任务，不允许自动训练。
+- `IMPLEMENTED` — 新增严格清单生成器
+  `scripts/generate_helsinki_long_range_1000_manifest.py`：五类各 200；全部路线规划长度
+  >=300 m；每类前 120 条必须通过严格楼宇内部门禁，因此总计至少 600/1000 条严格
+  内部路线。门禁包含建筑区路线占比、双侧楼宇、有效转弯、地图边界距离、5 米级
+  safety-envelope AGL 占比、无重入/重复边、heightmap 和 triangle 净距。
+- `IMPLEMENTED` — 新增 collect-only campaign
+  `scripts/run_helsinki_long_range_1000_campaign.py` 及后台流水线
+  `scripts/run_helsinki_long_range_1000_pipeline.py`。任何坏 episode 会被可恢复隔离并重采；
+  1000 条完成后只进入人工地图/RGB-D 复核，不训练。
+- `IMPLEMENTED` — Dataset collector 仅在提供
+  `urbanfly-helsinki-long-range-interior-scope-v1` 清单时允许扩展到 1000 个编号；旧路径
+  默认上限仍为 500。配置为
+  `uav_wm_navigation/configs/helsinki_dataset_v3_long_range_1000.yaml`。
+- `PASS (code)` — 相关脚本 `py_compile` PASS；collector/campaign 聚焦回归 10/10 PASS。
+- `RUNNING` — 严格清单生成 PID 32816；后台流水线 PID 34612。首次运行快照在前 15 个
+  候选中已接受 6 条严格内部路线，长度 572.5–866.6 m，五类任务均已有合格样本。
+  清单目录：`outputs/helsinki_dataset_v3/long_range_1000_manifest_20260903/`；生成 PASS 后
+  流水线自动启动 `outputs/helsinki_dataset_v3/long_range_1000_campaign_20260903/`。
+- `RUNNING UPDATE` — 后续快照为严格路线清单 67/1000，67 条均为 strict interior；
+  传感器 HDF5 正式采集尚未启动（0/1000），因为流水线先要求完整清单通过，防止再次
+  批量采到目标错误的数据。流水线已更新并以 PID 34200 重启：采集与 combined QA
+  完成后会自动把全部 1000 条转为 RGB + metric-depth + AGL 检查视频，输出到 campaign
+  的 `review_videos_rgbd/`；训练仍禁止。
+
+Current verdict: **`LONG-RANGE 1000 MANIFEST GENERATION RUNNING / >=600 STRICT INTERIOR
+HARD GATE / ALL ROUTES >=300 M / COLLECTION AUTO-STARTS AFTER MANIFEST / TRAINING BLOCKED`**.
+
+## 41. 新深度契约 500 条三维数据与自动重训任务（2026-09-03）
+
+- 用户明确要求恢复五类三维任务，而不是把高度固定在 5 m：
+  `building_blocked`、`street_canyon`、`rooftop_to_ground`、
+  `ground_to_rooftop`、`rooftop_to_rooftop`。
+- `PASS (format)` — Dataset writer/validator 新增
+  `urbanfly-helsinki-3d-flight-profile-v1`；每条新 HDF5 必须保存端点表面类型、规划
+  高度范围、垂直行程、逐 transition footprint AGL 与 2.5 m safety-envelope AGL，
+  并继续强制 `urbanfly-depth-perspective-v2`、真实 dt、执行动作和碰撞/净距标签。
+- `PASS (manifest)` — `urbanfly-helsinki-route-manifest-v2` 已生成 500 条并逐条做
+  train split、heightmap 和 triangle readback；五类严格各 100 条。各类规划垂直行程
+  P50 为 10.79 / 10.01 / 18.61 / 18.30 / 8.22 m，不是只写任务标签而高度不动。
+  清单：`outputs/helsinki_dataset_v2/corrected_depth_500_fast_20260903_manifest/route_manifest_v2.json`。
+- `FAIL (preserved tuning evidence)` — 5x 首次 smoke 的首条出现 24/105 stale；将动作
+  lease 延长后 stale=0，但观测间隔主要达到 1.0 s，第二条街谷发生 yaw 动作/响应
+  aggregate sign 不一致并被 validator 拒绝。两次失败目录保留，未混入正式数据。
+- `PASS (qualified fast profile)` — 2x、5 Hz nominal、0.6 s action lease 的五类真实
+  smoke 为 5/5 success、0 collision、0 stale、805 transitions；实际 dt min/P50/P95/max
+  为 0.2/0.2/0.4/0.6 s，depth near-clip ratio 0，五类均通过全部 HDF5/profile/AGL/yaw
+  gate。目录：`outputs/helsinki_dataset_v2/corrected_depth_fast_smoke5_retry_speed2_20260903/`。
+- `PASS (code regression)` — 聚焦 Dataset/collector/campaign 回归 19/19 PASS，相关
+  Python `py_compile` 和 `git diff --check` PASS。冻结 planner、controller、triangle
+  geometry、sampler 与 Local Goal 核心未修改；只调整 collector orchestration。
+- `COLLECTING` — durable campaign PID 12920 已启动，25 条一批，失败保留已闭合文件
+  并从下一个绝对编号继续，连续 3 次零产出才 fail-closed。记录目录：
+  `outputs/helsinki_dataset_v2/corrected_depth_500_fast_20260903_campaign/`。最近检查首批
+  2 条已闭合：2 success、0 collision、0 stale；这是运行中快照，不是完成声明。
+- `PLANNED / gated` — 只有 combined 500 QA PASS 且 stale=0 后，任务才自动训练
+  30-epoch observation policy，再训练 30-epoch、5-member、hidden-512 latent World
+  Model。目标分别为 `models/helsinki_observation_policy_depth_v2_500.pt` 和
+  `models/helsinki_latent_world_model_depth_v2_500.pt`。训练完成前均不得声称 PASS。
+- `PASS (monitoring)` — heartbeat `urbanfly-500` 每 10 分钟检查本地状态；正常且无
+  实质变化保持安静，只在 100/250/500、阶段切换、失败或完成时通知。
+
+Current verdict: **`500-ROUTE 3-D MANIFEST PASS / 2X FAST SMOKE5 PASS /
+FORMAL 500 COLLECTION RUNNING / LARGE TRAINING GATED AND NOT YET RUN`**.
+
+## 42. Corrected-depth 500 条完成与 RGB-D 检查视频（2026-09-03）
+
+- `PASS (collection)` — corrected-depth 正式采集已闭合 **500/500** 条；有效 HDF5
+  编号为 000–499，隔离的旧 stale 174 样本不计入有效集合。
+- `PASS (dataset audit)` — campaign 汇总报告中的 HDF5 完整性、partial、跨 episode
+  stale 和 reset 证据门禁通过。
+- `FAIL (training launch)` — 首次 observation-policy 训练尚未运行成功；合并 QA 仍携带
+  已隔离旧样本的 `stale_action` 记录，训练器按设计 fail-closed。有效 HDF5 无需重采，
+  需要修复 QA 聚合后重新启动训练。
+- `PASS (review videos)` — 新增
+  `scripts/render_helsinki_dataset_v2_review_videos.py`，从有效 HDF5 批量输出 **500/500**
+  个 RGB + 原始米制深度并排 MP4，0 转码失败。深度仅用单调对数灰度显示（近处白、
+  远处黑），不把伪彩颜色冒充模型输入；每帧叠加 episode、任务类型、深度、AGL、
+  clearance 和剩余距离。
+- `PASS (video verification)` — 输出 960×330、10 FPS，总计 1,292.5 MiB；首条 000、
+  中间 249、末条 499 均能读取首帧且容器帧数分别为 134、116、86。完整索引为
+  `outputs/helsinki_dataset_v2/corrected_depth_500_fast_20260903_campaign/review_videos_rgbd/video_index.json`。
+- `NEXT` — 修复 combined QA 对 quarantine 的过滤，重新审计，然后按原定配置训练
+  30-epoch observation policy 和 30-epoch latent World Model；不得放宽 stale/depth/
+  collision/yaw/HDF5 门禁。
+
+Current verdict: **`CORRECTED-DEPTH COLLECTION 500/500 PASS / RGB-D REVIEW VIDEOS
+500/500 PASS / TRAINING BLOCKED BY STALE QA AGGREGATION RECORD`**.
+
+## 45. 长程 pilot 摆动复核与用户停止指令（2026-09-04）
+
+- 用户在查看长程 RGB-D pilot 后明确指出无人机摆动过大，并要求停止一切采集。
+  `PASS (stop)` — 已核对并停止所有 `collect_helsinki_dataset_v1`、collection job、
+  long-range campaign/pipeline 和 manifest generator 相关进程；最终相关进程数为 0，
+  simulator=`stopped`、policy client=0。不得自动恢复 1,000 条生成或采集。
+- `FAIL (approval)` — 本轮 5 条长程 pilot 不获准作为 1,000 条扩量或训练依据；视频
+  仅保留为摆动/路线/深度诊断证据。训练仍禁止，未启动任何新模型训练。
+- `PASS (diagnostic artifacts)` — 五类各完成一条真实 RGB-D 回放并成功转码，输出目录为
+  `outputs/helsinki_dataset_v3/long_range_pilot5_campaign_v2_20260904/review_videos_rgbd/`。
+  其中 episode 001–004 的 collector summary 为 4/4 success、0 collision、0 stale；
+  episode 000 的物理飞行也是 success、0 collision、0 stale，当前独立 HDF5 validator
+  全项 PASS，但原 job 因旧 yaw 响应校验没有建成正式 PASS summary，所以只作诊断。
+- `FAIL (discarded attempt)` — 更早的首条候选仅有 3.50 m 规划 triangle 余量并在
+  91.7 m 处碰撞；该失败 HDF5 与日志保留在独立失败目录，不进入有效 pilot 或训练集。
+- `IMPLEMENTED / NOT APPROVED FOR RESUME` — collector 增加仅在未消费路线后向前匹配的
+  因果进度游标，避免相邻街段导致 Local Goal 进度回跳；qualified-route split 合同已
+  支持 `maze_train`/`maze_teacher_pilot`；长程候选最低 triangle 距离门槛由 3.5 m 提高
+  到 4.0 m，v3 action lease 从误写的 2.0 s 恢复为已验证的 0.6 s。相关聚焦回归
+  20/20 PASS。冻结 planner/controller/triangle/sampler/Local Goal 核心未修改。
+- `STOPPED` — 原始断点目录共有 71 条候选；按新的 >=4.0 m triangle 门槛只剩
+  44 条（building/street/roof-ground/ground-roof/roof-roof 为 7/10/8/10/9）。这只是
+  合格路线清单，不是 44 条 HDF5 实采数据。1,000 条任务当前不得称为采集中。
+- `NEXT` — 在用户重新授权前保持停止。若后续继续，先量化 pilot 的横向速度、yaw rate、
+  姿态角速度、轨迹曲率处超调和安全介入，修正 teacher 动作平滑/跟踪方式并重新做小批
+  视频 Gate；不得直接恢复大规模采集，更不得用摆动轨迹训练。
+
+Current verdict: **`ALL COLLECTION STOPPED / 5 PILOTS ARE DIAGNOSTIC ONLY /
+OSCILLATION REVIEW REQUIRED BEFORE ANY RESUME`**.
+
+## 46. 摆动量化、真实时间回放与限定对照试采（2026-09-04）
+
+- 用户只授权量化 yaw、横向速度、角速度和转弯超调，以及重新做小批视频验收。
+  **1,000 条 manifest/campaign/pipeline 保持 STOPPED，training_allowed=false；不得自动恢复。**
+- `FAIL (baseline motion quality)` — 已审计原五类 pilot：五条全部未通过新增运动质量
+  门槛。五条 episode 指标的中位数：yaw 实际角速度 P95=44.1444 deg/s，yaw 反向
+  9.84357 次/100m，实际 body-FLU 左向速度 P95=0.924712 m/s，转弯窗口水平轨迹
+  偏差 P95=2.28262 m，窗口偏差全体最大值=2.76540 m，窗口航向误差 P95=47.3192 deg。
+  三轴角速度模长 P95 为 66.13–73.64 deg/s，roll 绝对值 P95 为 14.80–16.01 deg。
+  成功到达、零碰撞、零 stale 不等于稳定示范。旧 HDF5 和失败证据均未删除或改写。
+- `PASS (audit implementation)` — 新增 `scripts/audit_helsinki_pilot_oscillation.py`。
+  yaw rate 使用 state→next_state 四元数航向差/factual dt；横向速度由完整姿态逆变换；
+  角速度使用真实遥测；进度沿 3-D 弧长；水平偏差为到路线线段的精确最短距离。
+  逐转弯记录 +/-15m 窗口偏差及沿转向方向超过出弯目标航向的角度。后者是平滑
+  路线的工程代理指标，不等于控制系统阶跃响应超调率，也不能单独作为飞行安全认证。
+  输出：`outputs/helsinki_dataset_v3/long_range_pilot5_oscillation_audit_20260904/`
+  下的 `oscillation_audit.json` 和 `oscillation_audit.png`。
+- `FAIL (old video timing) / PASS (corrected exports)` — 旧 renderer 把约 0.6s 一帧的
+  采样直接按 10FPS 播放，形成约 6x 快放。已改为按真实仿真时间映射到输出帧，默认
+  1x，未插值或伪造中间观测；不足帧率部分保持上一真实帧。添加 sim time、source dt、
+  yaw rate、body-left velocity、roll/pitch 叠字。五条 1x 视频全部转码验证通过，输出：
+  `outputs/helsinki_dataset_v3/long_range_pilot5_oscillation_audit_20260904/realtime_review_videos/`。
+  旧视频不再可用于判断真实摆动频率；真实遥测仍确认存在持续振荡。
+- `IMPLEMENTED (bounded diagnostic profile)` — 新增
+  `uav_wm_navigation/configs/helsinki_pilot10hz_review.yaml`：10Hz、动作 0.1s、仿真 1x；
+  保留原 lookahead=6m、最大速度=6m/s、yaw gain/cap、同一街谷路线。只改变更新时序，
+  不改 FROZEN planner/controller/triangle/sampler/LocalGoal 核心。collector 因果前向匹配
+  wrapper 改为等价向量化投影，并与冻结 selector 对照回归通过。
+- `PASS (one pilot collection) / FAIL (motion acceptance)` — 仅重采 episode001 同路线对照：
+  `outputs/helsinki_dataset_v3/oscillation_10hz_street_vectorized_20260904/`。job/collector 均
+  PASS，1,858 transitions、185.8s、实际 3-D 距离 714.1019m（水平距离 706.0405m）、
+  success、零碰撞/零 stale/零安全介入；dt P50/P95=0.1/0.1s。
+  相同路线旧→新：yaw rate P95 44.1444→6.98738deg/s；yaw 反向 9.84357→0次/100m
+  （忽略低于8deg/s的变化）；body-left speed P95 0.957415→0.716072m/s；三轴角速度
+  模长 P95 72.6365→9.40695deg/s；roll P95 15.9900→6.65571deg；转弯窗口轨迹偏差
+  P95 2.47129→0.897262m、max 2.54734→1.03174m；沿转向方向越过出弯目标航向
+  最大值 52.2904→5.69156deg。横向速度仍超过预先固定的0.6m/s，因此总门槛FAIL，
+  未追加其它路线，不放宽门槛，不训练。更早 offline preflight 和为替换慢 wrapper
+  而中止的试采输出均保留为失败记录，不计入有效数据。
+- `PASS (new 1x video)` — 新试采 RGB-D 视频 1858帧、10FPS、185.8秒，真实1x，无防抖
+  或插帧，首帧/90秒画面可解码。新审计 JSON/曲线与视频目录：
+  `outputs/helsinki_dataset_v3/oscillation_10hz_street_audit_20260904/`；视频为
+  `review_videos/001_street_canyon_rgbd.mp4`。
+- `LIMITATION (height / generalization)` — 新试采 AGL安全包络 min/P50/P95/max 为
+  4.852/5.937/10.218/13.134m，并非全程恒定5m。仅一条同路线时序对照，不足以证明
+  所有五类路线、风扰、速度范围都合格；未做新模型学习效果验证。
+- `FAIL (action-frame contract, diagnosed not repaired)` —
+  `helsinki_websocket_adapter.execute_velocity_command` 用完整四元数逆变换 ENU速度，
+  但 `Simulator.set_external_policy_action` 的 command_world
+  解码只用yaw/水平FLU；executed action也是yaw-aligned。新试采相同命令按两种方式
+  解释的速度向量差 P50/P95/max=0.201568/0.710434/1.08488m/s。报告已单列此诊断；
+  它不是实测tracking error，不能把两种坐标系的command/realized差直接解释成跟踪误差。
+  新试采实际yaw-aligned横向速度P95也为0.625184m/s。尚未修复接口或修改冻结核心。
+- 固定小试工程门槛：成功、零碰撞/零 stale；yaw rate P95<=25deg/s、yaw 反向<=3/100m、
+  body-left speed P95<=0.6m/s、roll P95<=10deg、转弯轨迹偏差 P95<=1.5m/max<=2m、
+  转弯航向误差 P95<=25deg。数值通过后仍需用户视频确认；不自动批准扩量或训练。
+- `PASS (regression)` — `python -m pytest tests/test_helsinki_oscillation_audit.py
+  uav_wm_navigation/tests/test_helsinki_collector_guard.py
+  uav_wm_navigation/tests/test_helsinki_dataset_v1.py tests/test_helsinki_dataset_v2_campaign.py -q`
+  为 25/25 PASS；`git diff --check` PASS。
+- `PASS (final stop)` — 唯一试采结束后已核实相关 collector/job/1000 campaign进程为0，
+  simulator=stopped、policy=0。未启动新训练。
+- `NEXT` — 先依据接口坐标系不一致这一新证据统一动作合同并补非零roll/pitch回归，
+  再处理剩余横向偏差、局部yaw尖峰并重新做限定小批视频Gate。不得自动恢复1,000条；
+  数值通过也需要用户审核视频。不要为了过门槛改为只统计yaw-horizontal或放宽0.6门槛。
+
+Current verdict: **`BASELINE MOTION FAIL / FIVE 1X REVIEW VIDEOS READY /
+ONE NEW 714M PILOT MOTION FAIL (LATERAL SPEED) / NEW 1X VIDEO READY /
+ALL COLLECTION AND TRAINING STOPPED`**.
+
+## 47. 动作接口修复及街区内部路线复核（2026-09-04）
+
+- 用户明确授权继续修复和限定小试；没有授权恢复1,000条或训练。
+- `PASS (interface regression)` — Helsinki适配器改用yaw-only逆变换发送ENU速度，匹配
+  冻结后端 `Simulator.set_external_policy_action`；不改后端或动力学。新增带非零
+  roll/pitch、多yaw、水平/升降速度的真实encoder→真实backend decoder回归。
+  新HDF5明确记录 `action_frame=YAW_ALIGNED_FLU`、
+  `action_encoding_version=helsinki-yaw-aligned-velocity-v2`；姿态仍为完整body-FLU。
+  不可把新旧动作版本混成同一种语义训练；旧文件不改写。审计中的两种坐标解释差值
+  仅表示旧encoder错误，不能再把正确v2编码的解释差值称为接口错误。
+- `RUNNING (one control comparison only)` — 相同外围街谷路线、相同10Hz配置的接口修复
+  对照输出：`outputs/helsinki_dataset_v3/action_frame_v2_street_pilot_20260904/`。
+  该路线仅作控制回归，不是合格的内部穿梭示范。
+- `FAIL (route-scope claim)` — 实际航线地图确认714m street_canyon沿东部街区外围绕行。
+  旧 `building_interior=true` 依赖附近建筑覆盖率、仅12%的双侧建筑门槛，不能证明
+  用户要求的街区内部穿梭。不得沿用旧五条的标签或44条候选直接扩量。当前没有新的
+  “五类内部路线均通过”的结论。地图证据：
+  `outputs/helsinki_dataset_v3/oscillation_10hz_street_audit_20260904/route_review/`。
+- `PASS (bounded reference geometry, NOT flight acceptance)` — 复用用户认可的702.9m视频
+  所对应路线拓扑，仅把目标AGL从5.0改为5.2m以取得>=4m几何余量；独立复核规划
+  718.2028m、11个主要转弯、三角网格最小距离4.05214m、无碰撞。新qualification：
+  `outputs/helsinki_dataset_v3/interior_reference_requalified_20260904/`；仅1条pilot清单：
+  `outputs/helsinki_dataset_v3/interior_reference_pilot_manifest_20260904/route_manifest_v2.json`。
+  此步没有新增RGB-D采集。它仍有规划AGL P95=12.39m/max=16.39m的限制，不能声明
+  全程5m验收通过。参考旧片含末尾next_state的实际3D距离703.04m（旧702.9m标题未含
+  最后一步）；旧HDF无AGL标签，新增参考图明确标记AGL由当前高度图重算。
+- `PASS (bulk stop guard)` — 1,000条campaign和pipeline在任何输出/启动工作前检查
+  `bulk_collection_authorized_by_user is True`；配置显式false，缺失也拒绝启动。
+  4项回归覆盖两个入口的缺失/false授权。只有用户明确批准后才能修改该授权标志。
+- `IMPLEMENTED` — `scripts/render_helsinki_pilot_route_review.py` 为任意已闭合pilot输出
+  未过滤实际轨迹、计划轨迹、起终点及AGL曲线；旧HDF缺AGL时明确记录重算来源。
+- `NEXT` — 先完成接口修复同路线对照并审计。通过后至多开展限定内部参考pilot；
+  若失败则保留证据继续定位，不启动五类批次或正式采集。重新设计内部路线判定需以
+  实际地图和视频为依据，并区分近地段/升降段，不能再只看建筑密度标签。
+
+Current verdict: **`ACTION FRAME FIX UNIT TESTED / ONE CONTROL PILOT RUNNING /
+OLD INTERIOR SCOPE CLAIM REJECTED / BULK COLLECTION AND TRAINING STOPPED`**.
+
+## 48. 城市业务语义点标注第一阶段（2026-09-04）
+
+- `IMPLEMENTED` — 业务标注直接集成在现有 Three.js Helsinki 查看器的“业务标注”页签，支持
+  供货点 100、送货点 100、补给点 20、无人机原始位点 20，共 240 个节点；支持中文自动编号、
+  类别标记、列表查看、类别修改、Mesh 重新定位、删除、撤销、导入/导出、后端保存和重新加载。
+  本阶段没有实现低空拓扑、自动连边、多无人机任务分配、新碰撞系统或 World Model/YOPO 修改。
+- `PASS (coordinate contract)` — 点击坐标由当前 Helsinki 可视 Mesh 的 Three.js raycast 直接取得
+  `hit.point`，不添加显示偏移；标记根 Group 位置与保存位置相同。统一格式为
+  `[east, up, north]`，即当前 UrbanFly 世界 `[x, y, z]`；因此前端显示、后端 JSON、后续规划/碰撞
+  读取的基础位置保持同一数值。
+- `PASS (storage)` — 后端新增 `GET/PUT /api/semantic-nodes`，使用原子替换写入并校验节点编号、
+  类别、有限坐标、重复编号和各类别数量上限。运行时文件为
+  `data/semantic_annotations/helsinki_business_nodes.json`，当前为空标注集，等待人工标注。
+- `PASS (tests)` — `frontend/npm test` 26/26 PASS；`frontend/npm run build` PASS；
+  `python -m pytest tests/test_semantic_nodes.py tests/test_server_runtime_metrics.py -q` 8/8 PASS；
+  `python -m py_compile backend/server/semantic_nodes.py backend/server/server.py` PASS。
+- `PASS (Windows browser)` — Windows 后端托管页面加载 Helsinki 真实 Mesh；“业务标注”页签可见；
+  真实 Mesh 点击成功创建 `供货点_001`，坐标示例为
+  `[-57.4385702067724, 7.966391863839192, 23.156130353671756]`；进度显示 `1 / 240`；保存接口
+  返回成功并通过 HTTP GET 读回 JSON；页面没有新增 JavaScript 错误。
+- `PASS (cleanup)` — 删除 `outputs` 下 516 个非关键中间视频，仅保留四个代表性视频：Helsinki
+  城市导航、低空建筑绕楼、近地低空关键 Demo、World Model 长程导航；删除 `outputs/runtime_logs`
+  下运行日志、重复/临时 QA 截图和仓库 Python/pytest 缓存。Helsinki 场景资产、collision/mesh/
+  heightmap/geometry、模型及实验 JSON/HDF5/NPZ 证据未删除；`tmp/swarm-main` 未删除。
+- `LIMITATION` — 当前没有识别到正式的 UrbanFly 多无人机成品 Demo 视频，因此没有用上游
+  `tmp/swarm-main/swarm/assets/Drone_flying.mp4` 冒充正式 Demo，也未删除该依赖目录。
+- `NEXT` — 人工完成 240 个节点后，下一阶段增加碰撞检查、最小净空、安全半径、接近方向、A* 可达性
+  以及 PASS/WARN/FAIL QA 字段；保持当前数采停止和 World Model/YOPO 不变。
+
+Current verdict: **`SEMANTIC ANNOTATION V1 PASS / FOUR KEY DEMOS RETAINED /
+BULK COLLECTION AND TRAINING STILL STOPPED`**.

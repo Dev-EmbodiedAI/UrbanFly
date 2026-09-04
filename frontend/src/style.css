@@ -506,7 +506,7 @@ select:focus-visible {
 
 .tab-bar {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 3px;
   padding: 3px;
   border-radius: 8px;
@@ -587,6 +587,180 @@ select:focus-visible {
 
 .tab-content.active {
   display: block;
+}
+
+.semantic-annotations-tab {
+  padding-top: 8px;
+}
+
+.annotation-toolbar,
+.annotation-type-picker,
+.annotation-actions,
+.annotation-file-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.annotation-toolbar {
+  justify-content: space-between;
+  margin-bottom: 9px;
+}
+
+.annotation-toolbar strong {
+  color: var(--text);
+  font-size: 11px;
+}
+
+.annotation-total,
+.annotation-mode-status {
+  color: var(--mint);
+  font: 8px "SFMono-Regular", Consolas, monospace;
+}
+
+.annotation-mode-status {
+  color: var(--amber);
+  text-align: right;
+}
+
+.annotation-type-picker {
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.annotation-type-picker select {
+  min-width: 130px;
+  height: 27px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  background: var(--panel-strong);
+  font-size: 9px;
+}
+
+.annotation-progress-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.annotation-progress-grid div {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.annotation-progress-grid strong {
+  color: var(--text);
+  font: 8px "SFMono-Regular", Consolas, monospace;
+}
+
+.annotation-swatch {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.annotation-swatch.supply { background: #f4b942; }
+.annotation-swatch.delivery { background: #39a9db; }
+.annotation-swatch.resupply { background: #48b779; }
+.annotation-swatch.drone-origin { background: #e76f51; }
+
+.annotation-actions,
+.annotation-file-actions {
+  flex-wrap: wrap;
+  margin-bottom: 7px;
+}
+
+.annotation-actions button,
+.annotation-file-actions button,
+.annotation-import-button {
+  min-height: 27px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  background: rgba(4, 13, 18, 0.72);
+  cursor: pointer;
+  font-size: 8px;
+}
+
+.annotation-actions button:hover,
+.annotation-file-actions button:hover,
+.annotation-import-button:hover,
+.annotation-actions button.active {
+  border-color: rgba(84, 199, 255, 0.55);
+  color: var(--text);
+  background: rgba(38, 111, 143, 0.28);
+}
+
+.annotation-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.annotation-message {
+  min-height: 16px;
+  margin: 3px 0 7px;
+  color: var(--soft);
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.annotation-list {
+  display: grid;
+  gap: 4px;
+  max-height: 240px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.annotation-row {
+  display: grid;
+  grid-template-columns: 9px minmax(0, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+  min-height: 27px;
+  padding: 5px 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+  text-align: left;
+}
+
+.annotation-row:hover,
+.annotation-row.selected {
+  border-color: rgba(84, 199, 255, 0.42);
+  background: rgba(84, 199, 255, 0.1);
+}
+
+.annotation-row strong {
+  color: var(--text);
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.annotation-row small {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--soft);
+  font: 7px "SFMono-Regular", Consolas, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sensor-tab {

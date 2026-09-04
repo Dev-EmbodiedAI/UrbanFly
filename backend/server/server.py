@@ -31,6 +31,7 @@ from .protocol import (
     create_error, create_message,
 )
 from .runtime_metrics import RuntimeMetrics
+from .semantic_nodes import SemanticNodeStore
 from ..config import SERVER
 
 
@@ -87,6 +88,9 @@ class SimulationServer:
 
         self.recording_dir = self.runtime_root / "outputs" / "runtime_recordings"
         self.recording_dir.mkdir(parents=True, exist_ok=True)
+        self.semantic_node_store = SemanticNodeStore(
+            self.runtime_root / "data" / "semantic_annotations" / "helsinki_business_nodes.json"
+        )
         self.app = web.Application(client_max_size=2 * 1024 ** 3)
         self._setup_routes()
 
@@ -96,7 +100,7 @@ class SimulationServer:
         async def browser_isolation_middleware(request, handler):
             response = await handler(request)
             response.headers["Access-Control-Allow-Origin"] = "*"
-            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+            response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, OPTIONS"
             response.headers["Access-Control-Allow-Headers"] = "Content-Type, Range"
             response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
             response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
@@ -110,6 +114,8 @@ class SimulationServer:
         # WebSocket 端点
         self.app.router.add_get("/ws", self._ws_handler)
         self.app.router.add_get("/api/health", self._health_handler)
+        self.app.router.add_get("/api/semantic-nodes", self._semantic_nodes_get_handler)
+        self.app.router.add_put("/api/semantic-nodes", self._semantic_nodes_put_handler)
         self.app.router.add_post("/api/runtime-recordings/{recording_id}", self._recording_upload_handler)
         self.app.router.add_get("/", self._index_handler)
 
@@ -181,6 +187,20 @@ class SimulationServer:
                 ],
             }
         )
+
+    async def _semantic_nodes_get_handler(self, request):
+        try:
+            return web.json_response(self.semantic_node_store.load())
+        except ValueError as error:
+            raise web.HTTPInternalServerError(text=str(error)) from error
+
+    async def _semantic_nodes_put_handler(self, request):
+        try:
+            document = await request.json()
+            saved = self.semantic_node_store.save(document)
+        except (json.JSONDecodeError, ValueError) as error:
+            raise web.HTTPBadRequest(text=str(error)) from error
+        return web.json_response(saved)
 
     async def _recording_upload_handler(self, request):
         recording_id = str(request.match_info["recording_id"])

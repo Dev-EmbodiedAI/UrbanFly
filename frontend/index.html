@@ -141,6 +141,7 @@
           <button class="tab-btn" data-tab="sensors" role="tab">传感器</button>
           <button class="tab-btn" data-tab="world-model" role="tab">世界模型</button>
           <button class="tab-btn" data-tab="semantic-agent" role="tab">语义智能体</button>
+          <button class="tab-btn" data-tab="semantic-annotations" role="tab">业务标注</button>
         </div>
         <div id="tab-tasks" class="tab-content active">
           <div id="task-summary"></div>
@@ -203,6 +204,46 @@
           <div class="section-title"><span>任务分配</span><strong id="semantic-plan-count">0 PLAN</strong></div>
           <div id="semantic-assignment-list" class="semantic-assignment-list"></div>
           <p class="semantic-agent-note">大模型仅生成结构化语义建议；确定性安全门、调度器和飞控拥有最终执行权。</p>
+        </div>
+
+        <div id="tab-semantic-annotations" class="tab-content semantic-annotations-tab">
+          <div class="annotation-toolbar">
+            <div>
+              <strong>城市业务语义点</strong>
+              <span id="annotation-total" class="annotation-total">0 / 240</span>
+            </div>
+            <span id="annotation-mode-status" class="annotation-mode-status">浏览模式</span>
+          </div>
+          <div class="annotation-type-picker">
+            <label for="annotation-type">当前类别</label>
+            <select id="annotation-type">
+              <option value="supply">供货点</option>
+              <option value="delivery">送货点</option>
+              <option value="resupply">补给点</option>
+              <option value="drone_origin">无人机原始位点</option>
+            </select>
+          </div>
+          <div class="annotation-progress-grid">
+            <div><span class="annotation-swatch supply"></span><span>供货点</span><strong id="annotation-count-supply">0 / 100</strong></div>
+            <div><span class="annotation-swatch delivery"></span><span>送货点</span><strong id="annotation-count-delivery">0 / 100</strong></div>
+            <div><span class="annotation-swatch resupply"></span><span>补给点</span><strong id="annotation-count-resupply">0 / 20</strong></div>
+            <div><span class="annotation-swatch drone-origin"></span><span>无人机原始位点</span><strong id="annotation-count-drone_origin">0 / 20</strong></div>
+          </div>
+          <div class="annotation-actions">
+            <button id="annotation-enable" type="button">点击场景新增</button>
+            <button id="annotation-reposition" type="button" disabled>重新定位所选</button>
+            <button id="annotation-delete" type="button" disabled>删除所选</button>
+            <button id="annotation-undo" type="button" disabled>撤销</button>
+          </div>
+          <div class="annotation-file-actions">
+            <button id="annotation-save" type="button">保存到后端</button>
+            <button id="annotation-load" type="button">重新加载</button>
+            <button id="annotation-export" type="button">导出 JSON</button>
+            <label class="annotation-import-button" for="annotation-import">导入 JSON</label>
+            <input id="annotation-import" type="file" accept="application/json,.json" hidden>
+          </div>
+          <p id="annotation-message" class="annotation-message">正在读取已保存标注…</p>
+          <div id="annotation-list" class="annotation-list" aria-live="polite"></div>
         </div>
       </aside>
 

@@ -8,6 +8,7 @@ import {
   disposeBoundsTree,
 } from 'three-mesh-bvh';
 
+const regularMeshRaycast = THREE.Mesh.prototype.raycast;
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
@@ -209,6 +210,27 @@ export class DigitalTwinRenderer {
     raycaster.firstHitOnly = true;
     const intersections = raycaster.intersectObjects(this.colliders, false);
     return intersections[0] ?? null;
+  }
+
+  raycastSurface(origin, direction, far = Infinity) {
+    const raycaster = new THREE.Raycaster(origin, direction, 0, far);
+    raycaster.layers.mask = this.sceneManager.camera.layers.mask;
+    raycaster.ray.origin.copy(origin);
+    raycaster.ray.direction.copy(direction).normalize();
+    raycaster.far = far;
+    const meshes = [];
+    this.meshGroup.traverse((object) => {
+      if (!object.isMesh) return;
+      meshes.push(object);
+    });
+    const intersections = [];
+    for (const mesh of meshes) regularMeshRaycast.call(mesh, raycaster, intersections);
+    intersections.sort((a, b) => a.distance - b.distance);
+    return intersections[0] ?? null;
+  }
+
+  raycastAnnotationSurface(origin, direction, far = Infinity) {
+    return this.raycastSurface(origin, direction, far);
   }
 
   _createGltfLoader() {
